@@ -1,5 +1,5 @@
 import AgentTerminal from "@/components/AgentTerminal";
-import WobbleVisualizer from "@/components/WobbleVisualizer";
+import InvisibleLawVisualizer from "@/components/InvisibleLawVisualizer";
 import BrandDashboard from "@/components/BrandDashboard";
 
 export default function Home() {
@@ -46,12 +46,12 @@ export default function Home() {
                 building autonomous systems, creative web experiences, and fully onchain products.
               </h1>
               <p className="font-mono text-xs text-text-slate leading-relaxed">
-                Blending LLM context engineering with ERC721 SVG contract renderers and complex interactive GSAP motion systems.
+                Blending LLM context engineering with onchain generative art engines governed by mathematical laws.
               </p>
             </div>
 
-            {/* Wobble Interactive SVG Creature */}
-            <WobbleVisualizer />
+            {/* Invisible Law Interactive SVG Generative Art */}
+            <InvisibleLawVisualizer />
 
             {/* Content Pillars Dashboard */}
             <BrandDashboard />

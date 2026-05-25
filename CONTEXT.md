@@ -1,7 +1,5 @@
 ## Workspace Name: 0xdas Personal Website Codebase
 
-STRICT: do not read the whole codebase. only read the part of codebase that is relevant to the user's request.
-
 ### Core Architecture & State (May 2026)
 - **Framework**: Next.js 16.2.6 (Turbopack) with React 19.
 - **Styling**: Tailwind CSS v4 custom variables (Stripe Dev dark mode palette `#011627`).
