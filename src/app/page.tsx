@@ -1,6 +1,7 @@
 import AgentTerminal from "@/components/AgentTerminal";
 import InvisibleLawVisualizer from "@/components/InvisibleLawVisualizer";
 import BrandDashboard from "@/components/BrandDashboard";
+import { ConnectButton } from "@rainbow-me/rainbowkit";
 
 export default function Home() {
   return (
@@ -27,6 +28,8 @@ export default function Home() {
           <a href="https://x.com/0xdas" target="_blank" rel="noopener noreferrer" className="hover:text-accent-blue transition-colors">twitter</a>
           <span>·</span>
           <a href="https://github.com/0xdas" target="_blank" rel="noopener noreferrer" className="hover:text-accent-purple transition-colors">github</a>
+          <span className="text-text-slate/40 text-xs">|</span>
+          <ConnectButton showBalance={false} chainStatus="icon" accountStatus="avatar" />
         </div>
       </header>
 

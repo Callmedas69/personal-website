@@ -1,46 +1,98 @@
 "use client";
 
-import React, { useState } from "react";
-import { Brain, Disc, Send, RefreshCw } from "lucide-react";
+import React, { useState, useEffect } from "react";
+import { Brain, Disc, Send, RefreshCw, Wallet } from "lucide-react";
+import { useAccount } from "wagmi";
+import { useContractReads } from "@/hooks/useContractReads";
+import { useMint } from "@/hooks/useMint";
+import { formatEther } from "viem";
+import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { INVISIBLE_LAW_ADDRESS } from "@/abi/InvisibleLaw";
 
 export default function BrandDashboard() {
   const [activeTab, setActiveTab] = useState<"ai" | "onchain">("ai");
+  const { isConnected } = useAccount();
   
-  // States for onchain panel
-  const [txLog, setTxLog] = useState<string[]>([
+  const { 
+    mintPrice, 
+    totalMinted, 
+    maxSupply, 
+    canMint,
+    isLoading: isContractLoading,
+  } = useContractReads();
+
+  const { mint, isPending, isConfirming, isSuccess, error, txHash } = useMint();
+
+  // States for simulated onchain panel (when wallet is not connected)
+  const [simLog, setSimLog] = useState<string[]>([
     "Ready to execute contract call...",
     "RPC connected: Base mainnet"
   ]);
-  const [isMinting, setIsMinting] = useState(false);
-  const [mintCount, setMintCount] = useState(0);
+  const [isSimulating, setIsSimulating] = useState(false);
+  const [simCount, setSimCount] = useState(0);
 
-  // Mock contract mint
-  const executeMint = () => {
-    if (isMinting) return;
-    setIsMinting(true);
-    setTxLog(prev => [...prev, ">> mutating InvisibleLawDNA(0x6180...)..."]);
+  // Trigger the InvisibleLaw visualizer to generate a new seed on successful actual mint
+  useEffect(() => {
+    if (isSuccess && txHash) {
+      if (typeof window !== "undefined") {
+        window.dispatchEvent(new CustomEvent("generate-trigger"));
+      }
+    }
+  }, [isSuccess, txHash]);
+
+  // Mock contract mint simulation (when wallet is not connected)
+  const executeSimulation = () => {
+    if (isSimulating) return;
+    setIsSimulating(true);
+    setSimLog(prev => [...prev, ">> simulating InvisibleLawDNA(0x6180...)..."]);
     
     setTimeout(() => {
-      setTxLog(prev => [...prev, ">> Gas estimated: 38,200 Gwei"]);
+      setSimLog(prev => [...prev, ">> Gas estimated: 38,200 Gwei"]);
       
       setTimeout(() => {
-        const txHash = "0x" + Array.from({length:64}, () => Math.floor(Math.random()*16).toString(16)).join("");
-        setMintCount(prev => prev + 1);
-        setTxLog(prev => [
+        const mockHash = "0x" + Array.from({length:64}, () => Math.floor(Math.random()*16).toString(16)).join("");
+        setSimCount(prev => prev + 1);
+        setSimLog(prev => [
           ...prev, 
-          `>> Tx Hash: ${txHash.slice(0, 10)}...${txHash.slice(-8)}`,
-          `>> Success: Invisible Law #${100 + mintCount} minted successfully on Base.`
+          `>> Simulated Tx Hash: ${mockHash.slice(0, 10)}...${mockHash.slice(-8)}`,
+          `>> Success: [SIMULATION] Invisible Law #${100 + simCount} minted.`
         ]);
-        setIsMinting(false);
+        setIsSimulating(false);
 
-        // Trigger the InvisibleLaw visualizer to generate a new seed!
+        // Trigger visualizer
         if (typeof window !== "undefined") {
           window.dispatchEvent(new CustomEvent("generate-trigger"));
         }
       }, 800);
     }, 500);
   };
+
+  const handleRealMint = () => {
+    if (!canMint || isPending || isConfirming) return;
+    mint(1, mintPrice);
+  };
+
+  // Dynamically compute transaction logs based on contract state to avoid setState-in-effect issues
+  const activeTxLog = ["Ready to execute contract call...", "RPC connected: Base mainnet"];
+  if (isPending) {
+    activeTxLog.push(">> Waiting for wallet confirmation...");
+  }
+  if (isConfirming) {
+    activeTxLog.push(">> Waiting for wallet confirmation...", ">> Transaction submitted. Confirming on Base L2...");
+  }
+  if (isSuccess && txHash) {
+    activeTxLog.push(
+      ">> Waiting for wallet confirmation...",
+      ">> Transaction submitted. Confirming on Base L2...",
+      `>> Tx Hash: ${txHash.slice(0, 10)}...${txHash.slice(-8)}`,
+      ">> Success: Invisible Law minted successfully on Base L2!"
+    );
+  }
+  if (error) {
+    activeTxLog.push(`>> Error: ${error.message.slice(0, 60)}...`);
+  }
+
+  const logsToRender = isConnected ? activeTxLog : simLog;
 
   return (
     <div className="w-full border border-border-line bg-terminal-bg rounded-lg flex flex-col overflow-hidden h-[300px] md:h-[320px]">
@@ -112,8 +164,14 @@ export default function BrandDashboard() {
           <div className="flex flex-col h-full justify-between space-y-3">
             {/* RPC Console Logs */}
             <div className="flex-1 bg-terminal-bg/60 border border-border-line rounded p-3 font-mono text-[10px] text-text-slate space-y-1 overflow-y-auto max-h-[140px]">
-              {txLog.map((log, index) => (
-                <div key={index} className={log.startsWith(">> Success") ? "text-accent-mint font-semibold" : ""}>
+              {logsToRender.map((log, index) => (
+                <div key={index} className={
+                  log.includes("Success:") 
+                    ? "text-accent-mint font-semibold" 
+                    : log.includes("Error:") 
+                    ? "text-red-400 font-semibold" 
+                    : ""
+                }>
                   {log}
                 </div>
               ))}
@@ -123,29 +181,62 @@ export default function BrandDashboard() {
             <div className="flex items-center justify-between border-t border-border-line/40 pt-3 font-mono">
               <div className="text-[10px] text-text-slate">
                 <div>Contract: <a href={`https://basescan.org/address/${INVISIBLE_LAW_ADDRESS}`} target="_blank" rel="noopener noreferrer" className="text-accent-blue hover:underline font-mono">0x6fd8b...05e7</a></div>
-                <div>Minted: <span className="text-accent-yellow font-bold">{mintCount} total</span></div>
-              </div>
-              <button
-                onClick={executeMint}
-                disabled={isMinting}
-                className="btn-primary flex items-center space-x-1 hover:brightness-110 active:scale-95 transition-all text-xs font-semibold px-3 py-1.5 rounded cursor-pointer select-none bg-accent-yellow text-terminal-bg border-none"
-                style={{
-                  background: isMinting ? "#244e56" : "#fec97d",
-                  color: isMinting ? "#75d1c4" : "#011627"
-                }}
-              >
-                {isMinting ? (
+                {isConnected ? (
                   <>
-                    <RefreshCw size={11} className="animate-spin" />
-                    <span>MINTING...</span>
+                    <div>Minted: <span className="text-accent-yellow font-bold">{isContractLoading ? "..." : `${totalMinted} / ${maxSupply}`}</span></div>
+                    <div>Price: <span className="text-text-primary">{isContractLoading ? "..." : `${formatEther(mintPrice)} ETH`}</span></div>
                   </>
                 ) : (
-                  <>
-                    <Send size={11} />
-                    <span>MINT ARTWORK</span>
-                  </>
+                  <div>Status: <span className="text-accent-yellow font-semibold">WALLET DISCONNECTED</span></div>
                 )}
-              </button>
+              </div>
+              
+              <div className="flex flex-col items-end justify-center">
+                {isConnected ? (
+                  <button
+                    onClick={handleRealMint}
+                    disabled={!canMint || isPending || isConfirming}
+                    className="btn-primary flex items-center space-x-1 hover:brightness-110 active:scale-95 transition-all text-xs font-semibold px-3 py-1.5 rounded cursor-pointer select-none bg-accent-yellow text-terminal-bg border-none"
+                    style={{
+                      background: (isPending || isConfirming) ? "#244e56" : "#fec97d",
+                      color: (isPending || isConfirming) ? "#75d1c4" : "#011627"
+                    }}
+                  >
+                    {isPending || isConfirming ? (
+                      <>
+                        <RefreshCw size={11} className="animate-spin" />
+                        <span>MINTING...</span>
+                      </>
+                    ) : (
+                      <>
+                        <Send size={11} />
+                        <span>MINT ARTWORK</span>
+                      </>
+                    )}
+                  </button>
+                ) : (
+                  <div className="flex items-center space-x-2">
+                    <button
+                      onClick={executeSimulation}
+                      disabled={isSimulating}
+                      className="px-2.5 py-1 text-[11px] font-mono border border-border-line text-text-slate hover:text-text-primary rounded hover:bg-terminal-inner/30 cursor-pointer"
+                    >
+                      {isSimulating ? "SIMULATING..." : "SIMULATE MINT"}
+                    </button>
+                    <ConnectButton.Custom>
+                      {({ openConnectModal }) => (
+                        <button
+                          onClick={openConnectModal}
+                          className="flex items-center space-x-1 text-xs font-semibold px-3 py-1.5 rounded cursor-pointer select-none bg-accent-blue text-terminal-bg border-none hover:brightness-110 active:scale-95 transition-all"
+                        >
+                          <Wallet size={11} />
+                          <span>CONNECT</span>
+                        </button>
+                      )}
+                    </ConnectButton.Custom>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         )}
