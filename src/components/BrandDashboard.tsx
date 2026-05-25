@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import { Brain, Disc, Send, RefreshCw } from "lucide-react";
+import { INVISIBLE_LAW_ADDRESS } from "@/abi/InvisibleLaw";
 
 export default function BrandDashboard() {
   const [activeTab, setActiveTab] = useState<"ai" | "onchain">("ai");
@@ -121,7 +122,7 @@ export default function BrandDashboard() {
             {/* Actions Grid */}
             <div className="flex items-center justify-between border-t border-border-line/40 pt-3 font-mono">
               <div className="text-[10px] text-text-slate">
-                <div>Contract: <span className="text-text-primary">InvisibleLaw.sol</span></div>
+                <div>Contract: <a href={`https://basescan.org/address/${INVISIBLE_LAW_ADDRESS}`} target="_blank" rel="noopener noreferrer" className="text-accent-blue hover:underline font-mono">0x6fd8b...05e7</a></div>
                 <div>Minted: <span className="text-accent-yellow font-bold">{mintCount} total</span></div>
               </div>
               <button
