@@ -15,12 +15,12 @@
 }
 
 :root {
-  --background: #0f121d;
+  --background: #011627;
   --foreground: #d8dee9;
 }
 
 @theme {
-  --color-brand-bg: #0f121d;
+  --color-brand-bg: #011627;
   --color-terminal-bg: #011627;
   --color-terminal-inner: #070d19;
   

@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useRef, useEffect } from "react";
-import { Terminal, AlertTriangle, Cpu, Command, Send, Eye } from "lucide-react";
+import { AlertTriangle, Cpu, Command, Send } from "lucide-react";
 import { gsap } from "gsap";
 import { useGSAP } from "@gsap/react";
 
@@ -20,6 +20,10 @@ export default function AgentTerminal() {
   const [isTyping, setIsTyping] = useState(false);
   const [currentResponseStream, setCurrentResponseStream] = useState("");
   
+  // Command History States
+  const [history, setHistory] = useState<string[]>([]);
+  const [historyIdx, setHistoryIdx] = useState(-1);
+  
   const terminalRef = useRef<HTMLDivElement>(null);
   const logsContainerRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -28,8 +32,8 @@ export default function AgentTerminal() {
   useGSAP(() => {
     gsap.from(terminalRef.current, {
       opacity: 0,
-      y: 40,
-      duration: 0.8,
+      y: 30,
+      duration: 0.6,
       ease: "power3.out",
     });
   }, { scope: terminalRef });
@@ -54,7 +58,7 @@ export default function AgentTerminal() {
     setCurrentResponseStream("");
     
     let currentIdx = 0;
-    const intervalTime = 8; // Speed of typing stream in ms
+    const intervalTime = 6; // Speed up streaming slightly
     
     return new Promise<void>((resolve) => {
       const timer = setInterval(() => {
@@ -92,12 +96,17 @@ export default function AgentTerminal() {
     if (sanitizedCmd === "clear") {
       setLogs([]);
       setInputVal("");
+      setHistoryIdx(-1);
       return;
     }
 
     if (sanitizedCmd === "") {
       return;
     }
+
+    // Add to history
+    setHistory(prev => [cmd, ...prev]);
+    setHistoryIdx(-1);
 
     // Process commands
     switch (true) {
@@ -106,8 +115,9 @@ export default function AgentTerminal() {
         response = `
 <div class="space-y-2 font-mono text-text-slate">
   <div class="text-accent-yellow font-bold uppercase mb-1">=== COGNITIVE ENTRY POINTS ===</div>
-  <div><span class="text-accent-mint font-semibold">/stack</span>     - View technical skill pillars (AI, Onchain, frontend)</div>
+  <div><span class="text-accent-mint font-semibold">/stack</span>     - View technical skill pillars (AI, Onchain, Creative)</div>
   <div><span class="text-accent-mint font-semibold">/projects</span>  - Inspect signature work (BasedMining, Wobbles, Vault)</div>
+  <div><span class="text-accent-mint font-semibold">/wobble</span>    - Trigger jump animation on Wobble NFT</div>
   <div><span class="text-accent-mint font-semibold">/status</span>    - Verify current developer availability</div>
   <div><span class="text-accent-mint font-semibold">/socials</span>   - Get socials coordinate (Farcaster, X, GitHub)</div>
   <div><span class="text-accent-mint font-semibold">/clear</span>     - Clear console screen</div>
@@ -119,8 +129,8 @@ export default function AgentTerminal() {
         response = `
 <div class="space-y-3 font-mono">
   <div>
-    <span class="text-accent-blue font-bold">[ AI & WORKFLOWS ]</span>
-    <ul class="list-disc list-inside text-text-slate ml-2 mt-1 space-y-1">
+    <span class="text-accent-blue font-bold">[ AI-NATIVE SYSTEMS ]</span>
+    <ul class="list-disc list-inside text-text-slate ml-2 mt-1 space-y-0.5">
       <li>LLM Context Ops & prompt engineering (<span class="text-accent-yellow">CLAUDE.md</span> boundary logic)</li>
       <li>Obsidian Vault architecture for startup productivity</li>
       <li>Agentic workflows and automated developer briefings</li>
@@ -128,15 +138,15 @@ export default function AgentTerminal() {
   </div>
   <div>
     <span class="text-accent-purple font-bold">[ ONCHAIN ENGINEERING ]</span>
-    <ul class="list-disc list-inside text-text-slate ml-2 mt-1 space-y-1">
+    <ul class="list-disc list-inside text-text-slate ml-2 mt-1 space-y-0.5">
       <li>Fully onchain metadata & SVG contract renderers</li>
-      <li>Smart contract development (Solidity on <span class="text-accent-blue">Base</span>)</li>
+      <li>Smart contract development (Solidity on <span class="text-accent-blue font-semibold">Base</span>)</li>
       <li>Client integration via viem, wagmi, ethers</li>
     </ul>
   </div>
   <div>
     <span class="text-accent-mint font-bold">[ CREATIVE FRONTEND ]</span>
-    <ul class="list-disc list-inside text-text-slate ml-2 mt-1 space-y-1">
+    <ul class="list-disc list-inside text-text-slate ml-2 mt-1 space-y-0.5">
       <li>React, Next.js (App Router), and TypeScript</li>
       <li>Complex UI animations using <span class="text-accent-yellow font-semibold">GSAP Timelines</span> & spring physics</li>
       <li>Utility-first styling with Tailwind CSS v4 design variables</li>
@@ -150,21 +160,33 @@ export default function AgentTerminal() {
         response = `
 <div class="space-y-3 font-mono text-text-slate">
   <div>
-    <span class="text-accent-green font-bold">1. BASEDMINING</span> <span class="text-xs text-text-muted">(Active client work)</span>
+    <span class="text-accent-green font-bold">1. BASEDMINING</span> <span class="text-[10px] text-text-slate/60">(Active client work)</span>
     <div class="ml-2 mt-0.5 text-text-primary">Content automation & video rendering pipeline.</div>
-    <div class="ml-2 text-xs text-text-slate">Stack: Remotion, Node.js, Farcaster client integrations.</div>
+    <div class="ml-2 text-[10px]">Stack: Remotion, Node.js, Farcaster client integrations.</div>
   </div>
   <div>
-    <span class="text-accent-green font-bold">2. WOBBLES</span> <span class="text-xs text-text-muted">(Fully Onchain NFTs)</span>
+    <span class="text-accent-green font-bold">2. WOBBLES</span> <span class="text-[10px] text-text-slate/60">(Fully Onchain NFTs)</span>
     <div class="ml-2 mt-0.5 text-text-primary">Dynamic, interactive creatures responding to onchain events.</div>
-    <div class="ml-2 text-xs text-text-slate">Stack: SVG Rendering, Solidity ERC-721, Base mainnet.</div>
+    <div class="ml-2 text-[10px]">Stack: SVG Rendering, Solidity ERC-721, Base mainnet.</div>
   </div>
   <div>
-    <span class="text-accent-green font-bold">3. COGNITIVE VAULT</span> <span class="text-xs text-text-muted">(Internal tools)</span>
+    <span class="text-accent-green font-bold">3. COGNITIVE VAULT</span> <span class="text-[10px] text-text-slate/60">(Internal tools)</span>
     <div class="ml-2 mt-0.5 text-text-primary">AI context engineering layer managing Obsidian shared brain.</div>
-    <div class="ml-2 text-xs text-text-slate">Stack: ContextOps routing, prompt mapping, daily hooks.</div>
+    <div class="ml-2 text-[10px]">Stack: ContextOps routing, prompt mapping, daily hooks.</div>
   </div>
 </div>`;
+        break;
+
+      case sanitizedCmd === "/wobble" || sanitizedCmd === "wobble":
+        isHTML = true;
+        response = `
+<div class="space-y-1 font-mono text-accent-yellow">
+  <div><span class="text-accent-mint font-bold">[SYSTEM]</span> Dispatched trigger signal to <span class="text-text-primary underline">wobble-trigger</span> event...</div>
+  <div class="text-text-slate text-xs pl-4">> Animating Wobble SVG on Base L2...</div>
+</div>`;
+        if (typeof window !== "undefined") {
+          window.dispatchEvent(new CustomEvent("wobble-trigger"));
+        }
         break;
 
       case sanitizedCmd === "/status" || sanitizedCmd === "status" || sanitizedCmd.includes("available") || sanitizedCmd.includes("availability"):
@@ -177,19 +199,19 @@ export default function AgentTerminal() {
 </div>`;
         break;
 
-      case sanitizedCmd === "/socials" || sanitizedCmd === "socials" || sanitizedCmd.includes("social") || sanitizedCmd.includes("contact") || sanitizedCmd.includes("github") || sanitizedCmd.includes("twitter"):
+      case sanitizedCmd === "/socials" || sanitizedCmd === "socials" || sanitizedCmd.includes("social") || sanitizedCmd.includes("contact") || sanitizedCmd.includes("github") || sanitizedCmd.includes("twitter") || sanitizedCmd.includes("warpcast") || sanitizedCmd.includes("farcaster"):
         isHTML = true;
         response = `
 <div class="font-mono space-y-2 text-text-slate">
   <div class="text-accent-blue font-bold uppercase mb-1">=== SOCIAL COORDINATES ===</div>
-  <div>Farcaster: <a href="https://warpcast.com/0xdas" target="_blank" rel="noopener noreferrer" class="text-accent-mint hover:underline font-semibold">warpcast.com/0xdas</a> <span class="text-xs text-text-muted">(4k followers)</span></div>
+  <div>Farcaster: <a href="https://warpcast.com/0xdas" target="_blank" rel="noopener noreferrer" class="text-accent-mint hover:underline font-semibold">warpcast.com/0xdas</a> <span class="text-xs text-text-slate/60">(4k followers)</span></div>
   <div>Twitter/X: <a href="https://x.com/0xdas" target="_blank" rel="noopener noreferrer" class="text-accent-mint hover:underline font-semibold">x.com/0xdas</a></div>
   <div>GitHub: <a href="https://github.com/0xdas" target="_blank" rel="noopener noreferrer" class="text-accent-mint hover:underline font-semibold">github.com/0xdas</a></div>
 </div>`;
         break;
 
       default:
-        response = `Command not found: "${cmd}". Type /help to see my available entry points.`;
+        response = `Command not found: "${cmd}". Type /help to see available coordinates.`;
         break;
     }
 
@@ -229,10 +251,32 @@ export default function AgentTerminal() {
     }
   };
 
+  // Keyboard navigation for command history (Up/Down Arrow)
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "ArrowUp") {
+      e.preventDefault();
+      if (history.length > 0 && historyIdx < history.length - 1) {
+        const nextIdx = historyIdx + 1;
+        setHistoryIdx(nextIdx);
+        setInputVal(history[nextIdx]);
+      }
+    } else if (e.key === "ArrowDown") {
+      e.preventDefault();
+      if (historyIdx > 0) {
+        const nextIdx = historyIdx - 1;
+        setHistoryIdx(nextIdx);
+        setInputVal(history[nextIdx]);
+      } else if (historyIdx === 0) {
+        setHistoryIdx(-1);
+        setInputVal("");
+      }
+    }
+  };
+
   return (
     <div 
       ref={terminalRef}
-      className="terminal-glow scanlines relative w-full max-w-4xl h-[620px] rounded-lg border border-border-line bg-terminal-bg flex flex-col overflow-hidden text-sm"
+      className="terminal-glow scanlines relative w-full h-[620px] rounded-lg border border-border-line bg-terminal-bg flex flex-col overflow-hidden text-sm"
       onClick={handleConsoleClick}
     >
       {/* Terminal Title Bar */}
@@ -247,13 +291,13 @@ export default function AgentTerminal() {
         </div>
         <div className="flex items-center text-xs text-text-slate font-mono space-x-1">
           <Cpu size={12} className="text-accent-mint animate-pulse" />
-          <span className="hidden sm:inline">talk-to-my-agent v1.0.0</span>
+          <span className="hidden sm:inline">talk-to-my-agent v1.1.0</span>
         </div>
       </div>
 
       {/* Terminal Screen Info Bar */}
       <div className="px-4 py-1.5 bg-terminal-inner/30 border-b border-border-line text-[11px] font-mono text-text-slate flex justify-between select-none">
-        <div>talk-to-my-agent · v1.0.0 · build dev · base-mainnet</div>
+        <div>talk-to-my-agent · v1.1.0 · base-mainnet</div>
         <div>UTC+7</div>
       </div>
 
@@ -269,7 +313,7 @@ export default function AgentTerminal() {
             <span className="inline-block w-2.5 h-5 bg-accent-blue animate-cursor"></span>
           </div>
           <div className="text-text-slate leading-relaxed max-w-xl text-[13px]">
-            trained on five years of onchain development, and the patient art of building autonomous agents that don't drain their wallets six blocks later.
+            trained on five years of onchain development, and the patient art of building autonomous agents that don&apos;t drain their wallets six blocks later.
           </div>
           <div className="flex items-center space-x-1.5 text-xs text-text-slate bg-terminal-bg/40 border border-border-line rounded px-3 py-1.5 w-fit">
             <AlertTriangle size={12} className="text-accent-yellow" />
@@ -317,28 +361,28 @@ export default function AgentTerminal() {
       <div className="px-4 py-2.5 bg-terminal-bg border-t border-border-line flex flex-wrap gap-2 items-center select-none">
         <span className="text-[11px] font-mono text-text-slate mr-1 flex items-center gap-1">
           <Command size={10} />
-          $ try one &gt;
+          $ try &gt;
         </span>
         <button 
           onClick={() => handleSuggestionClick("/stack")}
           disabled={isTyping}
           className="px-2 py-0.5 rounded text-xs font-mono border border-border-line text-accent-blue bg-terminal-inner/40 hover:bg-accent-blue/10 hover:border-accent-blue/40 transition-colors disabled:opacity-40"
         >
-          [ what's your stack? ]
+          [ /stack ]
         </button>
         <button 
           onClick={() => handleSuggestionClick("/projects")}
           disabled={isTyping}
           className="px-2 py-0.5 rounded text-xs font-mono border border-border-line text-accent-yellow bg-terminal-inner/40 hover:bg-accent-yellow/10 hover:border-accent-yellow/40 transition-colors disabled:opacity-40"
         >
-          [ show me a project ]
+          [ /projects ]
         </button>
         <button 
-          onClick={() => handleSuggestionClick("/status")}
+          onClick={() => handleSuggestionClick("/wobble")}
           disabled={isTyping}
           className="px-2 py-0.5 rounded text-xs font-mono border border-border-line text-accent-mint bg-terminal-inner/40 hover:bg-accent-mint/10 hover:border-accent-mint/40 transition-colors disabled:opacity-40"
         >
-          [ are you available? ]
+          [ /wobble ]
         </button>
         <button 
           onClick={() => handleSuggestionClick("/help")}
@@ -364,6 +408,7 @@ export default function AgentTerminal() {
           type="text" 
           value={inputVal}
           onChange={(e) => setInputVal(e.target.value.slice(0, 200))}
+          onKeyDown={handleKeyDown}
           disabled={isTyping}
           placeholder={isTyping ? "agent is responding..." : "ask your agent a question..."}
           className="flex-1 bg-transparent border-none outline-none font-mono text-sm ml-2.5 text-text-primary placeholder-text-slate/60 disabled:cursor-not-allowed"
@@ -371,7 +416,7 @@ export default function AgentTerminal() {
         />
         <div className="flex items-center space-x-3 text-xs font-mono text-text-slate">
           <span className="hidden sm:inline-block text-[10px] text-text-slate/65 border border-border-line px-1 rounded bg-terminal-bg/50">
-            tab ⇆ to use
+            ↑↓ for history
           </span>
           <span className="w-12 text-right text-[11px]">
             {inputVal.length}/200
