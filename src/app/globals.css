@@ -1,0 +1,99 @@
+@import "tailwindcss";
+
+@font-face {
+  font-family: 'Sohne';
+  src: url('https://stripe.dev/fonts/Sohne.woff2') format('woff2');
+  font-weight: 300 700;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Sohne Mono';
+  src: url('https://stripe.dev/fonts/SohneMono-Buch.woff2') format('woff2');
+  font-weight: 300 700;
+  font-style: normal;
+}
+
+:root {
+  --background: #0f121d;
+  --foreground: #d8dee9;
+}
+
+@theme {
+  --color-brand-bg: #0f121d;
+  --color-terminal-bg: #011627;
+  --color-terminal-inner: #070d19;
+  
+  --color-text-primary: #d8dee9;
+  --color-text-slate: #5f7d97;
+  --color-text-muted: #999999;
+  
+  --color-accent-blue: #6e9cf1;
+  --color-accent-yellow: #fec97d;
+  --color-accent-mint: #75d1c4;
+  --color-accent-green: #aae87b;
+  --color-accent-purple: #9372c9;
+  
+  --color-border-line: rgba(192, 199, 209, 0.12);
+  
+  --font-sans: 'Sohne', system-ui, sans-serif;
+  --font-mono: 'Sohne Mono', 'JetBrains Mono', ui-monospace, monospace;
+}
+
+body {
+  background-color: var(--color-brand-bg);
+  color: var(--color-text-primary);
+  font-family: var(--font-sans);
+  overflow-x: hidden;
+}
+
+/* Custom Utilities for Terminal Vibe */
+.terminal-glow {
+  box-shadow: 0 0 40px rgba(110, 156, 241, 0.08), 0 0 80px rgba(117, 209, 196, 0.03);
+}
+
+/* Blinking terminal cursor */
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+.animate-cursor {
+  animation: blink 1s step-end infinite;
+}
+
+/* Scrollbar styling matching terminal dark look */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-terminal-inner);
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(95, 125, 151, 0.3);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(110, 156, 241, 0.5);
+}
+
+/* Custom terminal scanning lines effect */
+.scanlines {
+  position: relative;
+  overflow: hidden;
+}
+
+.scanlines::before {
+  content: " ";
+  display: block;
+  position: absolute;
+  top: 0; left: 0; bottom: 0; right: 0;
+  background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+  z-index: 10;
+  background-size: 100% 4px, 6px 100%;
+  pointer-events: none;
+}
