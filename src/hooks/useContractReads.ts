@@ -15,6 +15,8 @@ export interface ContractData {
   remaining: number;
   isSoldOut: boolean;
   canMint: boolean;
+  isOwner: boolean;
+  ownerAddress: string | null;
   isLoading: boolean;
   isError: boolean;
   error: Error | null;
@@ -62,6 +64,11 @@ export function useContractReads(): ContractData {
         abi: INVISIBLE_LAW_ABI,
         functionName: "allowlistFreeMint",
       },
+      {
+        address: INVISIBLE_LAW_ADDRESS,
+        abi: INVISIBLE_LAW_ABI,
+        functionName: "owner",
+      },
     ],
     query: {
       refetchInterval: 15000,
@@ -88,6 +95,7 @@ export function useContractReads(): ContractData {
   const maxSupply = Number((staticData?.[4]?.result as bigint | undefined) ?? BigInt(618)); // Supply is 618
   const maxPerWallet = Number((staticData?.[5]?.result as bigint | undefined) ?? BigInt(5));
   const allowlistFreeMint = Number((staticData?.[6]?.result as bigint | undefined) ?? BigInt(1));
+  const ownerAddress = (staticData?.[7]?.result as string | undefined) ?? null;
 
   // Parse user data
   const userMinted = isConnected
@@ -98,6 +106,9 @@ export function useContractReads(): ContractData {
   const remaining = maxSupply - totalMinted;
   const isSoldOut = remaining <= 0;
   const canMint = mintActive && !paused && !isSoldOut;
+
+  const isOwner = isConnected && !!address && !!ownerAddress && 
+    address.toLowerCase() === ownerAddress.toLowerCase();
 
   // Combined refetch
   const refetch = () => {
@@ -119,6 +130,8 @@ export function useContractReads(): ContractData {
     remaining,
     isSoldOut,
     canMint,
+    isOwner,
+    ownerAddress,
     isLoading: staticLoading,
     isError: staticError,
     error: staticErr ?? null,

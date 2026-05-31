@@ -93,7 +93,7 @@ export default function AgentTerminal() {
     let response = "";
     let isHTML = false;
 
-    if (sanitizedCmd === "clear") {
+    if (sanitizedCmd === "clear" || sanitizedCmd === "/clear") {
       setLogs([]);
       setInputVal("");
       setHistoryIdx(-1);
@@ -117,7 +117,7 @@ export default function AgentTerminal() {
   <div class="text-accent-yellow font-bold uppercase mb-1">=== COGNITIVE ENTRY POINTS ===</div>
   <div><span class="text-accent-mint font-semibold">/stack</span>     - View technical skill pillars (AI, Onchain)</div>
   <div><span class="text-accent-mint font-semibold">/projects</span>  - Inspect signature work (BasedMining, InvisibleLaw, Vault)</div>
-  <div><span class="text-accent-mint font-semibold">/generate</span>  - Recompute Bauhaus mosaic grid (generative seed)</div>
+  <div><span class="text-accent-mint font-semibold">/archives</span>  - Browse previous experiments and past builds</div>
   <div><span class="text-accent-mint font-semibold">/status</span>    - Verify current developer availability</div>
   <div><span class="text-accent-mint font-semibold">/socials</span>   - Get socials coordinate (Farcaster, X, GitHub)</div>
   <div><span class="text-accent-mint font-semibold">/clear</span>     - Clear console screen</div>
@@ -162,12 +162,12 @@ export default function AgentTerminal() {
   <div>
     <span class="text-accent-green font-bold">1. BASEDMINING</span> <span class="text-[10px] text-text-slate/60">(Active client work)</span>
     <div class="ml-2 mt-0.5 text-text-primary">Content automation & video rendering pipeline.</div>
-    <div class="ml-2 text-[10px]">Stack: Remotion, Node.js, Farcaster client integrations.</div>
+    <div class="ml-2 text-[10px]">Stack: Remotion, Node.js.</div>
   </div>
   <div>
-    <span class="text-accent-green font-bold">2. INVISIBLE LAW</span> <span class="text-[10px] text-text-slate/60">(Generative Art NFTs)</span>
-    <div class="ml-2 mt-0.5 text-text-primary">Geometric abstraction in the tradition of Kandinsky and Mondrian on a 9x9 Phi grid.</div>
-    <div class="ml-2 text-[10px]">Stack: Fully onchain SVG Rendering, Solidity ERC-721, Base L2.</div>
+    <span class="text-accent-green font-bold">2. ARCNOTIFY</span> <span class="text-[10px] text-text-slate/60">(Under development)</span>
+    <div class="ml-2 mt-0.5 text-text-primary">Webhook notification service for Arc L1.</div>
+    <div class="ml-2 text-[10px]">Stack: Next.js, Neon/Drizzle, Upstash QStash, Clerk, Resend, Viem.</div>
   </div>
   <div>
     <span class="text-accent-green font-bold">3. COGNITIVE VAULT</span> <span class="text-[10px] text-text-slate/60">(Internal tools)</span>
@@ -177,18 +177,6 @@ export default function AgentTerminal() {
 </div>`;
         break;
 
-      case sanitizedCmd === "/generate" || sanitizedCmd === "generate" || sanitizedCmd === "/mint" || sanitizedCmd === "mint":
-        isHTML = true;
-        response = `
-<div class="space-y-1 font-mono text-accent-yellow">
-  <div><span class="text-accent-mint font-bold">[SYSTEM]</span> Dispatched trigger signal to <span class="text-text-primary underline">generate-trigger</span> event...</div>
-  <div class="text-text-slate text-xs pl-4">> Recomputing Bauhaus mosaic grid on Base L2...</div>
-</div>`;
-        if (typeof window !== "undefined") {
-          window.dispatchEvent(new CustomEvent("generate-trigger"));
-        }
-        break;
-
       case sanitizedCmd === "/status" || sanitizedCmd === "status" || sanitizedCmd.includes("available") || sanitizedCmd.includes("availability"):
         isHTML = true;
         response = `
@@ -196,6 +184,31 @@ export default function AgentTerminal() {
   <div><span class="text-text-primary">Status:</span> <span class="text-accent-mint font-semibold">Active</span> building autonomous agents on Base.</div>
   <div><span class="text-text-primary">Availability:</span> Open for high-leverage consulting or technical advisory roles at the intersection of AI + Onchain.</div>
   <div><span class="text-text-primary">Ecosystem:</span> Base / Ethereum L2s</div>
+</div>`;
+        break;
+
+      case sanitizedCmd === "/archives" || sanitizedCmd === "archives" || sanitizedCmd.includes("archive") || sanitizedCmd.includes("past") || sanitizedCmd.includes("previous"):
+        isHTML = true;
+        response = `
+<div class="space-y-3 font-mono text-text-slate">
+  <div class="text-accent-yellow font-bold uppercase mb-1">=== PREVIOUS BUILDS ===</div>
+  <div>
+    <span class="text-accent-blue font-bold">[ ON HOLD ]</span>
+    <div class="ml-2 mt-1 space-y-1.5">
+      <div><span class="text-text-primary font-semibold">Invisible Law</span> <span class="text-[10px] text-text-slate/60">(ERC-721)</span><div class="ml-2 text-[10px]">Generative geometric bauhaus art by implementing golden ratio as a law.</div></div>
+      <div><span class="text-text-primary font-semibold">Judith</span> <span class="text-[10px] text-text-slate/60">(AI Tool)</span><div class="ml-2 text-[10px]">Public accountability website targeting Bankr.bot. AI-drafted escalations posted publicly on Twitter/X and a permanent wall of shame.</div></div>
+      <div><span class="text-text-primary font-semibold">The ARC Academy</span> <span class="text-[10px] text-text-slate/60">(Platform)</span><div class="ml-2 text-[10px]">Financial literacy platform for Gen Alpha. Structured curriculum delivery with interactive progress tracking.</div></div>
+    </div>
+  </div>
+  <div>
+    <span class="text-accent-purple font-bold">[ ARCHIVED ]</span>
+    <div class="ml-2 mt-1 space-y-1.5">
+      <div><span class="text-text-primary font-semibold">BaseCred</span> <span class="text-[10px] text-text-slate/60">(DeFi)</span><div class="ml-2 text-[10px]">Decision engine on aggregated onchain reputation (ethos, neynar, and talent protocol).</div></div>
+      <div><span class="text-text-primary font-semibold">Lore</span> <span class="text-[10px] text-text-slate/60">(Mini-App)</span><div class="ml-2 text-[10px]">Farcaster mini-app and frame (Winter Resonance). AI-rephrased winter mantras with onchain sealing.</div></div>
+      <div><span class="text-text-primary font-semibold">Phi</span> <span class="text-[10px] text-text-slate/60">(Solidity)</span><div class="ml-2 text-[10px]">Solidity contracts for Invisible Law. Fully onchain SVG generation engine using mathematical Phi libraries.</div></div>
+      <div><span class="text-text-primary font-semibold">Geoplet ERC-721</span> <span class="text-[10px] text-text-slate/60">(NFT)</span><div class="ml-2 text-[10px]">Warplet transformation into geometric bauhaus style.</div></div>
+    </div>
+  </div>
 </div>`;
         break;
 
@@ -297,7 +310,9 @@ export default function AgentTerminal() {
 
       {/* Terminal Screen Info Bar */}
       <div className="px-4 py-1.5 bg-terminal-inner/30 border-b border-border-line text-[11px] font-mono text-text-slate flex justify-between select-none">
-        <div>talk-to-my-agent · v1.1.0 · base-mainnet</div>
+        <div>
+          <span className="hidden sm:inline">talk-to-my-agent · </span>v1.1.0 · base-mainnet
+        </div>
         <div>UTC+7</div>
       </div>
 
@@ -378,11 +393,11 @@ export default function AgentTerminal() {
           [ /projects ]
         </button>
         <button 
-          onClick={() => handleSuggestionClick("/generate")}
+          onClick={() => handleSuggestionClick("/archives")}
           disabled={isTyping}
-          className="px-2 py-0.5 rounded text-xs font-mono border border-border-line text-accent-mint bg-terminal-inner/40 hover:bg-accent-mint/10 hover:border-accent-mint/40 transition-colors disabled:opacity-40"
+          className="px-2 py-0.5 rounded text-xs font-mono border border-border-line text-accent-purple bg-terminal-inner/40 hover:bg-accent-purple/10 hover:border-accent-purple/40 transition-colors disabled:opacity-40"
         >
-          [ /generate ]
+          [ /archives ]
         </button>
         <button 
           onClick={() => handleSuggestionClick("/help")}
@@ -398,9 +413,9 @@ export default function AgentTerminal() {
         onSubmit={handleFormSubmit}
         className="flex items-center px-4 py-3 bg-terminal-inner border-t border-border-line select-none"
       >
-        <div className="flex items-center space-x-2 text-xs font-mono">
-          <span className="text-accent-green font-bold">client@0xdas</span>
-          <span className="text-text-slate">~</span>
+        <div className="flex items-center space-x-1.5 text-xs font-mono">
+          <span className="text-accent-green font-bold hidden sm:inline">client@0xdas</span>
+          <span className="text-text-slate hidden sm:inline">~</span>
           <span className="text-accent-blue font-bold">%</span>
         </div>
         <input 

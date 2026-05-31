@@ -6,13 +6,14 @@ import { INVISIBLE_LAW_ADDRESS, INVISIBLE_LAW_ABI } from "@/abi/InvisibleLaw";
 import { useContractReads } from "./useContractReads";
 
 export interface MintState {
-  mint: (quantity: number, value: bigint, proof?: `0x${string}`[]) => void;
+  mint: (quantity: number, value: bigint, isOwner?: boolean, proof?: `0x${string}`[]) => void;
   isPending: boolean;
   isConfirming: boolean;
   isSuccess: boolean;
   error: Error | null;
   txHash: `0x${string}` | undefined;
   reset: () => void;
+  receipt?: any;
 }
 
 export function useMint(): MintState {
@@ -28,6 +29,7 @@ export function useMint(): MintState {
   } = useWriteContract();
 
   const {
+    data: receipt,
     isLoading: isConfirming,
     isSuccess,
     error: confirmError,
@@ -52,14 +54,23 @@ export function useMint(): MintState {
     resetWrite();
   };
 
-  const mint = (quantity: number, value: bigint, proof: `0x${string}`[] = []) => {
-    writeContract({
-      address: INVISIBLE_LAW_ADDRESS,
-      abi: INVISIBLE_LAW_ABI,
-      functionName: "mint",
-      args: [BigInt(quantity), proof],
-      value,
-    });
+  const mint = (quantity: number, value: bigint, isOwner: boolean = false, proof: `0x${string}`[] = []) => {
+    if (isOwner) {
+      writeContract({
+        address: INVISIBLE_LAW_ADDRESS,
+        abi: INVISIBLE_LAW_ABI,
+        functionName: "ownerMint",
+        args: [BigInt(quantity)],
+      });
+    } else {
+      writeContract({
+        address: INVISIBLE_LAW_ADDRESS,
+        abi: INVISIBLE_LAW_ABI,
+        functionName: "mint",
+        args: [BigInt(quantity), proof],
+        value,
+      });
+    }
   };
 
   return {
@@ -70,5 +81,6 @@ export function useMint(): MintState {
     error: writeError ?? confirmError ?? null,
     txHash: hash,
     reset,
+    receipt,
   };
 }

@@ -1,8 +1,8 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Brain, Disc, Send, RefreshCw, Wallet } from "lucide-react";
-import { useAccount } from "wagmi";
+import { useAccount, useBlockNumber } from "wagmi";
 import { useContractReads } from "@/hooks/useContractReads";
 import { useMint } from "@/hooks/useMint";
 import { formatEther } from "viem";
@@ -11,22 +11,29 @@ import { INVISIBLE_LAW_ADDRESS } from "@/abi/InvisibleLaw";
 
 export default function BrandDashboard() {
   const [activeTab, setActiveTab] = useState<"ai" | "onchain">("ai");
-  const { isConnected } = useAccount();
+  const { address, isConnected, connector, chain } = useAccount();
+  const { data: blockNumber } = useBlockNumber({ watch: true });
   
   const { 
     mintPrice, 
     totalMinted, 
     maxSupply, 
     canMint,
+    isOwner,
+    userMinted,
+    remaining,
+    maxPerWallet,
     isLoading: isContractLoading,
   } = useContractReads();
 
-  const { mint, isPending, isConfirming, isSuccess, error, txHash } = useMint();
+  const { mint, isPending, isConfirming, isSuccess, error, txHash, receipt } = useMint();
+  const consoleLogsRef = useRef<HTMLDivElement>(null);
 
   // States for simulated onchain panel (when wallet is not connected)
   const [simLog, setSimLog] = useState<string[]>([
-    "Ready to execute contract call...",
-    "RPC connected: Base mainnet"
+    "RPC status: Connected to Base mainnet",
+    "Wallet status: DISCONNECTED",
+    "Ready to execute simulation..."
   ]);
   const [isSimulating, setIsSimulating] = useState(false);
   const [simCount, setSimCount] = useState(0);
@@ -44,10 +51,16 @@ export default function BrandDashboard() {
   const executeSimulation = () => {
     if (isSimulating) return;
     setIsSimulating(true);
-    setSimLog(prev => [...prev, ">> simulating InvisibleLawDNA(0x6180...)..."]);
+    setSimLog([
+      "RPC status: Connected to Base mainnet",
+      "Wallet status: DISCONNECTED (SIMULATED)",
+      ">> Simulating contract write to InvisibleLaw...",
+      ">> Gas estimated: 38,243 units",
+      ">> Awaiting simulated signature approval..."
+    ]);
     
     setTimeout(() => {
-      setSimLog(prev => [...prev, ">> Gas estimated: 38,200 Gwei"]);
+      setSimLog(prev => [...prev, ">> Simulated signature approved."]);
       
       setTimeout(() => {
         const mockHash = "0x" + Array.from({length:64}, () => Math.floor(Math.random()*16).toString(16)).join("");
@@ -55,44 +68,126 @@ export default function BrandDashboard() {
         setSimLog(prev => [
           ...prev, 
           `>> Simulated Tx Hash: ${mockHash.slice(0, 10)}...${mockHash.slice(-8)}`,
-          `>> Success: [SIMULATION] Invisible Law #${100 + simCount} minted.`
+          `>> Success: [SIMULATION] Invisible Law #${100 + simCount} minted.`,
+          `>> Gas used: 52,109 units`
         ]);
         setIsSimulating(false);
-
+ 
         // Trigger visualizer
         if (typeof window !== "undefined") {
           window.dispatchEvent(new CustomEvent("generate-trigger"));
         }
       }, 800);
-    }, 500);
+    }, 800);
   };
 
   const handleRealMint = () => {
-    if (!canMint || isPending || isConfirming) return;
-    mint(1, mintPrice);
+    if (isPending || isConfirming || (!isOwner && !canMint)) return;
+    mint(1, mintPrice, isOwner);
   };
 
   // Dynamically compute transaction logs based on contract state to avoid setState-in-effect issues
-  const activeTxLog = ["Ready to execute contract call...", "RPC connected: Base mainnet"];
+  const activeTxLog: string[] = [];
+
+  // 1. Connection & RPC details
+  if (chain) {
+    activeTxLog.push(`RPC status: Connected to ${chain.name} (Chain ID: ${chain.id})`);
+  } else {
+    activeTxLog.push("RPC status: Connected to Base mainnet");
+  }
+
+  if (blockNumber) {
+    activeTxLog.push(`Current block: #${blockNumber.toString()}`);
+  }
+
+  if (connector && address) {
+    const shortenedAddr = `${address.slice(0, 6)}...${address.slice(-4)}`;
+    activeTxLog.push(`Wallet status: Connected via ${connector.name} (${shortenedAddr})`);
+  } else {
+    activeTxLog.push("Wallet status: Connected");
+  }
+
+  // 2. Contract parameters
+  activeTxLog.push(`Contract address: ${INVISIBLE_LAW_ADDRESS}`);
+  if (!isContractLoading) {
+    activeTxLog.push(`Contract status: ${canMint ? "ACTIVE" : "INACTIVE"} | Total Minted: ${totalMinted} / ${maxSupply}`);
+    activeTxLog.push(`User Balance: ${userMinted} PHI | Unit Price: ${formatEther(mintPrice)} ETH`);
+  }
+
+  // 3. Mint transaction logs
   if (isPending) {
-    activeTxLog.push(">> Waiting for wallet confirmation...");
+    activeTxLog.push(">> [1/3] Signature requested: Please confirm the transaction in your wallet...");
   }
-  if (isConfirming) {
-    activeTxLog.push(">> Waiting for wallet confirmation...", ">> Transaction submitted. Confirming on Base L2...");
+
+  if (txHash) {
+    activeTxLog.push(`>> [2/3] Broadcasted. Tx Hash: ${txHash}`);
+    if (isConfirming) {
+      activeTxLog.push(">> [3/3] Confirming transaction on Base L2... waiting for inclusion...");
+    }
   }
-  if (isSuccess && txHash) {
-    activeTxLog.push(
-      ">> Waiting for wallet confirmation...",
-      ">> Transaction submitted. Confirming on Base L2...",
-      `>> Tx Hash: ${txHash.slice(0, 10)}...${txHash.slice(-8)}`,
-      ">> Success: Invisible Law minted successfully on Base L2!"
-    );
+
+  if (isSuccess) {
+    activeTxLog.push(">> [3/3] Confirmed!");
+    if (receipt) {
+      activeTxLog.push(`>> Success: Invisible Law minted in block #${receipt.blockNumber.toString()}!`);
+      activeTxLog.push(`>> Gas used: ${receipt.gasUsed?.toString() || "unknown"} units`);
+    } else {
+      activeTxLog.push(">> Success: Invisible Law minted successfully on Base L2!");
+    }
   }
+
   if (error) {
-    activeTxLog.push(`>> Error: ${error.message.slice(0, 60)}...`);
+    let errorMsg = error.message;
+    if (errorMsg.includes("User rejected the request") || errorMsg.includes("User denied transaction signature")) {
+      errorMsg = "User rejected transaction signature.";
+    } else if (errorMsg.length > 80) {
+      errorMsg = errorMsg.slice(0, 80) + "...";
+    }
+    activeTxLog.push(`>> [ERROR] Transaction failed: ${errorMsg}`);
   }
 
   const logsToRender = isConnected ? activeTxLog : simLog;
+
+  // Auto-scroll the RPC Console Logs to the bottom when new logs are added
+  useEffect(() => {
+    if (consoleLogsRef.current) {
+      consoleLogsRef.current.scrollTop = consoleLogsRef.current.scrollHeight;
+    }
+  }, [logsToRender, activeTab]);
+
+  // Dynamic button states
+  let buttonText = "MINT ARTWORK";
+  let buttonDisabled = isPending || isConfirming;
+  
+  if (isOwner) {
+    buttonText = isPending || isConfirming ? "MINTING..." : "MINT (OWNER)";
+  } else if (!isContractLoading) {
+    if (remaining <= 0) {
+      buttonText = "SOLD OUT";
+      buttonDisabled = true;
+    } else if (!canMint) {
+      buttonText = "MINT INACTIVE";
+      buttonDisabled = true;
+    } else if (userMinted >= maxPerWallet) {
+      buttonText = "MAX PER WALLET";
+      buttonDisabled = true;
+    } else if (isPending || isConfirming) {
+      buttonText = "MINTING...";
+    }
+  }
+
+  // Button background & text color
+  let buttonBgColor = "#fec97d"; // Default accent yellow
+  let buttonTextColor = "#011627";
+  if (buttonDisabled) {
+    if (isPending || isConfirming) {
+      buttonBgColor = "#244e56"; // Muted teal during minting
+      buttonTextColor = "#75d1c4";
+    } else {
+      buttonBgColor = "#0d1b2a"; // Dark greyish-blue when disabled
+      buttonTextColor = "#5f7d97";
+    }
+  }
 
   return (
     <div className="w-full border border-border-line bg-terminal-bg rounded-lg flex flex-col overflow-hidden h-[300px] md:h-[320px]">
@@ -129,31 +224,34 @@ export default function BrandDashboard() {
         {activeTab === "ai" && (
           <div className="space-y-4 h-full flex flex-col justify-between">
             <div className="font-mono text-xs text-text-slate leading-relaxed">
-              <span className="text-accent-blue font-bold">ContextOps Context Engine</span>
-              <p className="mt-1">Active node structure mapping Obsidian vault memory loops and agent boundary logic. Restricts LLM paths to prevent cognitive drift.</p>
+              <span className="text-accent-blue font-bold block mb-1">
+                <a 
+                  href="https://arxiv.org/html/2603.16021v2" 
+                  target="_blank" 
+                  rel="noopener noreferrer" 
+                  className="hover:underline cursor-pointer"
+                >
+                  Interpretable Context Methodology (ICM)
+                </a>
+              </span>
+              <p className="text-[10px] leading-relaxed">
+                Multi-agent frameworks introduce unnecessary engineering overhead for sequential, human-in-the-loop workflows. Interpretable Context Methodology (ICM) replaces code-orchestrated complexity with simple filesystem structure, using numbered folders for workflow stages and plain markdown files for prompts. This allows a single agent, reading files at the right moments, to execute workflows that would otherwise require full multi-agent orchestration.
+              </p>
             </div>
             
             {/* Visual Node Graph Grid */}
             <div className="grid grid-cols-3 gap-2 py-1 font-mono text-[10px] text-center select-none">
               <div className="border border-accent-blue/30 rounded p-2 bg-accent-blue/5 hover:border-accent-blue/70 transition-colors cursor-help">
-                <div className="font-semibold text-accent-blue">CLAUDE.md</div>
-                <div className="text-[8px] text-text-slate mt-0.5">ROUTING RULES</div>
-              </div>
-              <div className="border border-border-line rounded p-2 bg-terminal-bg/40 flex items-center justify-center text-text-slate">
-                <span>⇆</span>
+                <div className="font-semibold text-accent-blue text-[9px] sm:text-[10px]">CLAUDE.md</div>
+                <div className="text-[7.5px] text-text-slate mt-0.5">ROUTING RULES</div>
               </div>
               <div className="border border-accent-mint/30 rounded p-2 bg-accent-mint/5 hover:border-accent-mint/70 transition-colors cursor-help">
-                <div className="font-semibold text-accent-mint">CONTEXT.md</div>
-                <div className="text-[8px] text-text-slate mt-0.5">WORKSPACE RULES</div>
+                <div className="font-semibold text-accent-mint text-[9px] sm:text-[10px]">CONTEXT.md</div>
+                <div className="text-[7.5px] text-text-slate mt-0.5">WORKSPACE RULES</div>
               </div>
-              
-              <div className="col-span-3 flex justify-center py-1">
-                <div className="w-0.5 h-4 bg-border-line"></div>
-              </div>
-
-              <div className="col-span-3 border border-accent-yellow/30 rounded p-2 bg-accent-yellow/5 hover:border-accent-yellow/70 transition-colors cursor-help max-w-xs mx-auto w-full">
-                <div className="font-semibold text-accent-yellow">00_NOW / morning-briefing.md</div>
-                <div className="text-[8px] text-text-slate mt-0.5">DAILY TASK STATE SYNCHRONIZATION</div>
+              <div className="border border-accent-yellow/30 rounded p-2 bg-accent-yellow/5 hover:border-accent-yellow/70 transition-colors cursor-help">
+                <div className="font-semibold text-accent-yellow text-[9px] sm:text-[10px]">Folder Structure</div>
+                <div className="text-[7.5px] text-text-slate mt-0.5">WORKFLOW STAGES</div>
               </div>
             </div>
           </div>
@@ -163,13 +261,20 @@ export default function BrandDashboard() {
         {activeTab === "onchain" && (
           <div className="flex flex-col h-full justify-between space-y-3">
             {/* RPC Console Logs */}
-            <div className="flex-1 bg-terminal-bg/60 border border-border-line rounded p-3 font-mono text-[10px] text-text-slate space-y-1 overflow-y-auto max-h-[140px]">
+            <div 
+              ref={consoleLogsRef}
+              className="flex-1 bg-terminal-bg/60 border border-border-line rounded p-3 font-mono text-[10px] text-text-slate space-y-1 overflow-y-auto max-h-[140px]"
+            >
               {logsToRender.map((log, index) => (
                 <div key={index} className={
-                  log.includes("Success:") 
+                  log.includes("Success:") || log.includes("Confirmed!")
                     ? "text-accent-mint font-semibold" 
-                    : log.includes("Error:") 
+                    : log.includes("Error:") || log.includes("[ERROR]")
                     ? "text-red-400 font-semibold" 
+                    : log.includes("Connected to") || log.includes("Wallet status:") || log.includes("RPC status:")
+                    ? "text-accent-blue"
+                    : log.includes(">>")
+                    ? "text-accent-yellow"
                     : ""
                 }>
                   {log}
@@ -180,14 +285,14 @@ export default function BrandDashboard() {
             {/* Actions Grid */}
             <div className="flex items-center justify-between border-t border-border-line/40 pt-3 font-mono">
               <div className="text-[10px] text-text-slate">
-                <div>Contract: <a href={`https://basescan.org/address/${INVISIBLE_LAW_ADDRESS}`} target="_blank" rel="noopener noreferrer" className="text-accent-blue hover:underline font-mono">0x6fd8b...05e7</a></div>
-                {isConnected ? (
+                {isConnected && (
                   <>
-                    <div>Minted: <span className="text-accent-yellow font-bold">{isContractLoading ? "..." : `${totalMinted} / ${maxSupply}`}</span></div>
-                    <div>Price: <span className="text-text-primary">{isContractLoading ? "..." : `${formatEther(mintPrice)} ETH`}</span></div>
+                    {isOwner ? (
+                      <div className="text-accent-mint font-bold mt-0.5">[OWNER CONNECTED]</div>
+                    ) : !canMint ? (
+                      <div className="text-accent-yellow font-semibold mt-0.5">[PUBLIC INACTIVE]</div>
+                    ) : null}
                   </>
-                ) : (
-                  <div>Status: <span className="text-accent-yellow font-semibold">WALLET DISCONNECTED</span></div>
                 )}
               </div>
               
@@ -195,22 +300,24 @@ export default function BrandDashboard() {
                 {isConnected ? (
                   <button
                     onClick={handleRealMint}
-                    disabled={!canMint || isPending || isConfirming}
-                    className="btn-primary flex items-center space-x-1 hover:brightness-110 active:scale-95 transition-all text-xs font-semibold px-3 py-1.5 rounded cursor-pointer select-none bg-accent-yellow text-terminal-bg border-none"
+                    disabled={buttonDisabled}
+                    className={`btn-primary flex items-center space-x-1 hover:brightness-110 transition-all text-xs font-semibold px-3 py-1.5 rounded select-none border-none ${
+                      buttonDisabled ? "cursor-not-allowed opacity-75" : "cursor-pointer active:scale-95"
+                    }`}
                     style={{
-                      background: (isPending || isConfirming) ? "#244e56" : "#fec97d",
-                      color: (isPending || isConfirming) ? "#75d1c4" : "#011627"
+                      background: buttonBgColor,
+                      color: buttonTextColor
                     }}
                   >
                     {isPending || isConfirming ? (
                       <>
                         <RefreshCw size={11} className="animate-spin" />
-                        <span>MINTING...</span>
+                        <span>{buttonText}</span>
                       </>
                     ) : (
                       <>
                         <Send size={11} />
-                        <span>MINT ARTWORK</span>
+                        <span>{buttonText}</span>
                       </>
                     )}
                   </button>
