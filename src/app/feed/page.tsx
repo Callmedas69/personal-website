@@ -16,203 +16,11 @@ interface FeedItem {
   excerpt?: string;
 }
 
-// Pre-compiled mock entries to enrich the feed page and fit the Stripe design
-const initialMockItems: FeedItem[] = [
-  {
-    id: "mock-1",
-    title: "Building autonomous coding agents on Base L2",
-    subtitle: "How to ship production-ready dApps without paying massive gas fees.",
-    date: "2026.06.01",
-    type: "BLOG",
-    topics: ["AI", "Crypto", "Engineering"],
-    url: "https://x.com/0xdas",
-    excerpt: "An in-depth look at deploying AI-directed agents that interact with Base smart contracts and manage liquidity parameters autonomously using the Viem framework."
-  },
-  {
-    id: "mock-2",
-    title: "ICM: Replacing Multi-Agent Orchestration with Filesystems",
-    subtitle: "Why numbered folders and markdown files beat complex state engines.",
-    date: "2026.05.28",
-    type: "VIDEO",
-    topics: ["AI", "Best Practices", "Developer Productivity"],
-    url: "https://x.com/0xdas",
-    excerpt: "Demonstrating how a single LLM loop utilizing a structured filesystem workspace outperforms multi-agent graphs in task reliability and clarity."
-  },
-  {
-    id: "mock-3",
-    title: "Invisible Law: Generative Art under Math Constraints",
-    subtitle: "Implementing golden ratio constraints directly into ERC-721 SVG templates.",
-    date: "2026.05.20",
-    type: "BLOG",
-    topics: ["Crypto", "Engineering"],
-    url: "https://x.com/0xdas",
-    excerpt: "Explaining the mathematics behind the golden ratio spiral composition used to render fully onchain vector artwork without external CDN dependencies."
-  },
-  {
-    id: "mock-4",
-    title: "Stripe Startups Build Day Mexico City",
-    subtitle: "Meeting the founders building automated billing engines.",
-    date: "2026.08.19",
-    type: "EVENT",
-    topics: ["Build Day", "Meetup"],
-    url: "https://x.com/0xdas",
-    excerpt: "Sharing insights from our developer keynote on designing payment flows for AI assistant usage models."
-  },
-  {
-    id: "mock-5",
-    title: "Stripe London developer meetup - June 2026",
-    subtitle: "Interactive sessions on Stripe Workflows and custom agents.",
-    date: "2026.06.23",
-    type: "EVENT",
-    topics: ["Meetup", "Workflows"],
-    url: "https://x.com/0xdas",
-    excerpt: "Panel discussion on standardizing webhook handlers using Next.js route handlers and serverless workers."
-  },
-  {
-    id: "mock-6",
-    title: "Stripe Tour: London",
-    subtitle: "Accelerating global commerce with autonomous agents.",
-    date: "2026.06.10",
-    type: "EVENT",
-    topics: ["Meetup", "Payments"],
-    url: "https://x.com/0xdas",
-    excerpt: "Exploring payment processing triggers and transactional integrity constraints in distributed multi-agent operations."
-  },
-  {
-    id: "mock-7",
-    title: "Your agent is failing because your docs are stale",
-    subtitle: "Keeping LLM context synced with dynamic library definitions.",
-    date: "2026.06.03",
-    type: "VIDEO",
-    topics: ["AI", "Developer Productivity"],
-    url: "https://x.com/0xdas",
-    excerpt: "Watch how out-of-date API specs cause agent failure loops, and learn how to configure auto-syncing context docs in your repositories."
-  },
-  {
-    id: "mock-8",
-    title: "Inside minions: how Stripe uses autonomous one-shot AI coding",
-    subtitle: "Deep-dive into Sentry's automated codebase patching engines.",
-    date: "2026.05.28",
-    type: "VIDEO",
-    topics: ["AI", "Engineering", "Testing"],
-    url: "https://x.com/0xdas",
-    excerpt: "Breaking down code generation boundaries and how strict verification scripts contain agent execution failures."
-  },
-  {
-    id: "mock-9",
-    title: "Building autonomous coding agents at Stripe",
-    subtitle: "A walkthrough of internal development environments for AI.",
-    date: "2026.05.26",
-    type: "VIDEO",
-    topics: ["AI", "Developer Productivity"],
-    url: "https://x.com/0xdas",
-    excerpt: "Technical presentation on containerized development workspaces where agents safely execute tests and bundle scripts."
-  },
-  {
-    id: "mock-10",
-    title: "I gave Stripe Projects an idea and it materialized an entire stack",
-    subtitle: "From prompt description to fully functional billing portal.",
-    date: "2026.05.26",
-    type: "VIDEO",
-    topics: ["AI", "Payments", "Workflows"],
-    url: "https://x.com/0xdas",
-    excerpt: "Watch the execution pipeline generate database schemas, API routes, and a React frontend in real-time."
-  },
-  {
-    id: "mock-11",
-    title: "What it feels like building with Stripe Projects",
-    subtitle: "Evaluating the developer experience of generative IDEs.",
-    date: "2026.05.26",
-    type: "BLOG",
-    topics: ["Developer Productivity", "Getting Started"],
-    url: "https://x.com/0xdas",
-    excerpt: "Comparing manual coding loops with agentic prompt-compile cycles, highlighting speed blocks and mental model alignments."
-  },
-  {
-    id: "mock-12",
-    title: "Building a personalized cooking agent with ElevenLabs and Gemini",
-    subtitle: "Hands-free cooking assistant utilizing voice synthesis.",
-    date: "2026.05.23",
-    type: "VIDEO",
-    topics: ["AI", "Engineering"],
-    url: "https://x.com/0xdas",
-    excerpt: "Integrating Gemini multimodal input with real-time speech responses to handle recipe execution steps."
-  },
-  {
-    id: "mock-13",
-    title: "You can't whisper at an AI agent",
-    subtitle: "Why aggressive specs produce higher-quality agent outputs.",
-    date: "2026.05.14",
-    type: "BLOG",
-    topics: ["AI", "Best Practices"],
-    url: "https://x.com/0xdas",
-    excerpt: "Establishing the rule of clear specifications: if you wouldn't assign the task to a human developer with this little detail, don't expect the agent to guess it."
-  },
-  {
-    id: "mock-14",
-    title: "From init to deploy: building with agents and Stripe Projects",
-    subtitle: "Full lifecycle walkthrough of a SaaS dashboard.",
-    date: "2026.04.29",
-    type: "BLOG",
-    topics: ["Engineering", "Getting Started"],
-    url: "https://x.com/0xdas",
-    excerpt: "Deploying code directly from agent generation outputs onto serverless infrastructure with immediate verification loops."
-  },
-  {
-    id: "mock-15",
-    title: "Formatting an entire 25 million line codebase overnight",
-    subtitle: "Standardizing codebase style across legacy repositories.",
-    date: "2026.04.28",
-    type: "BLOG",
-    topics: ["Best Practices", "Developer Productivity", "Engineering"],
-    url: "https://x.com/0xdas",
-    excerpt: "The automation steps and testing strategies used to deploy formatters across Stripe without interrupting active PRs."
-  },
-  {
-    id: "mock-16",
-    title: "Selective Test Execution: Fast CI for a 50M-line Ruby monorepo",
-    subtitle: "Skipping irrelevant tests via code change graph tracing.",
-    date: "2026.04.09",
-    type: "BLOG",
-    topics: ["Best Practices", "Engineering", "Testing"],
-    url: "https://x.com/0xdas",
-    excerpt: "How to parse AST trees to compile a list of affected test files, reducing CI wait times from 40 minutes to under 3 minutes."
-  },
-  {
-    id: "mock-17",
-    title: "Provision a production-ready dev stack from your terminal",
-    subtitle: "Instant developer workspaces via CLI configurations.",
-    date: "2026.03.26",
-    type: "BLOG",
-    topics: ["Developer Productivity", "Getting Started"],
-    url: "https://x.com/0xdas",
-    excerpt: "Configuring containerized setups that boot up with databases pre-seeded and auth variables configured in under 5 seconds."
-  },
-  {
-    id: "mock-18",
-    title: "Designing flexible payment flows with Checkout Session",
-    subtitle: "Customizing customer journeys during payment captures.",
-    date: "2026.03.06",
-    type: "BLOG",
-    topics: ["Payments", "Workflows"],
-    url: "https://x.com/0xdas",
-    excerpt: "Best practices for passing custom metadata and handling webhooks to enable conditional access permissions instantly."
-  },
-  {
-    id: "mock-19",
-    title: "Building a mental model for Stripe payments",
-    subtitle: "Understand the core concepts of accounts, balances, and charges.",
-    date: "2026.02.19",
-    type: "BLOG",
-    topics: ["Payments", "Getting Started"],
-    url: "https://x.com/0xdas",
-    excerpt: "A beginner-friendly map to understanding payment gateways and ledger reconciliation rules without drowning in documentation."
-  }
-];
-
 export default function Feed() {
-  const [feedItems, setFeedItems] = useState<FeedItem[]>(initialMockItems);
-  const [filteredItems, setFilteredItems] = useState<FeedItem[]>(initialMockItems);
+  const [feedItems, setFeedItems] = useState<FeedItem[]>([]);
+  const [filteredItems, setFilteredItems] = useState<FeedItem[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [expandedRow, setExpandedRow] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   
@@ -222,43 +30,64 @@ export default function Feed() {
   const [typeOpen, setTypeOpen] = useState(true);
   const [topicOpen, setTypeTopicOpen] = useState(true);
 
-  // Fetch live articles from Paragraph on mount
+  // Fetch live articles from Paragraph on mount (published only)
   useEffect(() => {
     async function fetchParagraphPosts() {
       try {
-        const res = await fetch(
-          "https://public.api.paragraph.com/api/v1/publications/09JzlxG6yh5Ii8jvcUnb/posts"
-        );
-        if (res.ok) {
-          const data = await res.json();
-          if (data.items && data.items.length > 0) {
-            const livePosts: FeedItem[] = data.items.map((post: any) => {
-              const dateObj = new Date(Number(post.publishedAt));
+        setIsLoading(true);
+        setError(null);
+        
+        const publishedRes = await fetch("/api/posts?status=published");
+        const livePosts: FeedItem[] = [];
+
+        if (publishedRes && publishedRes.ok) {
+          const publishedData = await publishedRes.json();
+          if (publishedData.items) {
+            publishedData.items.forEach((post: any) => {
+              let timestamp = Number(post.publishedAt || post.updatedAt);
+              if (timestamp < 10000000000) {
+                timestamp = timestamp * 1000;
+              }
+              const dateObj = new Date(timestamp);
               const formattedDate = isNaN(dateObj.getTime())
                 ? "2026.06.02"
                 : `${dateObj.getFullYear()}.${String(dateObj.getMonth() + 1).padStart(2, "0")}.${String(dateObj.getDate()).padStart(2, "0")}`;
 
-              return {
+              const cats = post.categories || [];
+              let type: "BLOG" | "VIDEO" | "EVENT" = "BLOG";
+              if (cats.some((c: string) => c.toLowerCase().includes("video"))) {
+                type = "VIDEO";
+              } else if (cats.some((c: string) => c.toLowerCase().includes("event") || c.toLowerCase().includes("meetup"))) {
+                type = "EVENT";
+              }
+
+              livePosts.push({
                 id: post.id,
                 title: post.title,
-                subtitle: post.subtitle || "Published on Paragraph.",
+                subtitle: post.subtitle || "",
                 date: formattedDate,
-                type: "BLOG",
-                topics: post.categories ? post.categories.map((c: string) => c.toUpperCase()) : ["AI"],
+                type,
+                topics: cats.map((c: string) => c.trim().toUpperCase()).filter(Boolean).length 
+                  ? cats.map((c: string) => c.trim().toUpperCase()) 
+                  : ["AI"],
                 url: `https://paragraph.xyz/@0x168d8b4f50bb3aa67d05a6937b643004257118ed/${post.slug}`,
                 excerpt: post.subtitle || "Click to read the full article on Paragraph."
-              };
-            });
-
-            // Merge live posts, avoiding duplicates
-            setFeedItems(prev => {
-              const filteredPrev = prev.filter(p => !livePosts.some(lp => lp.title === p.title));
-              return [...livePosts, ...filteredPrev];
+              });
             });
           }
+        } else {
+          throw new Error("Failed to fetch published posts from API");
         }
-      } catch (e) {
+
+        // Sort posts by date descending
+        livePosts.sort((a, b) => b.date.localeCompare(a.date));
+
+        setFeedItems(livePosts);
+      } catch (e: any) {
         console.error("Failed to fetch posts from Paragraph API", e);
+        setError(e.message || "Failed to load posts.");
+      } finally {
+        setIsLoading(false);
       }
     }
     fetchParagraphPosts();
@@ -266,7 +95,7 @@ export default function Feed() {
 
   // Extract unique topics and counts for filter panel
   const allTopics = Array.from(new Set(feedItems.flatMap(item => item.topics))).sort();
-  const allTypes = ["BLOG", "VIDEO", "EVENT"];
+  const allTypes = Array.from(new Set(feedItems.map(item => item.type))).sort();
 
   const getTopicCount = (topic: string) => feedItems.filter(item => item.topics.includes(topic)).length;
   const getTypeCount = (type: string) => feedItems.filter(item => item.type === type).length;
@@ -365,62 +194,66 @@ export default function Feed() {
             </div>
 
             {/* Accordion: Type */}
-            <div className="space-y-2.5">
-              <button
-                onClick={() => setTypeOpen(!typeOpen)}
-                className="w-full flex items-center justify-between font-mono text-xs text-text-primary font-bold hover:text-accent-blue transition-colors cursor-pointer"
-              >
-                <span className="flex items-center space-x-1.5">
-                  <span className="w-1.5 h-1.5 bg-accent-blue rounded-sm"></span>
-                  <span>Type</span>
-                </span>
-                <ChevronDown size={14} className={`transform transition-transform ${typeOpen ? "" : "-rotate-90"}`} />
-              </button>
-              {typeOpen && (
-                <div className="pl-3.5 space-y-1.5">
-                  {allTypes.map(type => (
-                    <label key={type} className="flex items-center space-x-2 font-mono text-xs text-text-slate hover:text-text-primary cursor-pointer select-none">
-                      <input
-                        type="checkbox"
-                        checked={selectedTypes.includes(type)}
-                        onChange={() => handleTypeChange(type)}
-                        className="rounded bg-terminal-inner border-border-line text-accent-blue focus:ring-0 outline-none cursor-pointer"
-                      />
-                      <span>{type.charAt(0) + type.slice(1).toLowerCase()} ({getTypeCount(type)})</span>
-                    </label>
-                  ))}
-                </div>
-              )}
-            </div>
+            {allTypes.length > 0 && (
+              <div className="space-y-2.5">
+                <button
+                  onClick={() => setTypeOpen(!typeOpen)}
+                  className="w-full flex items-center justify-between font-mono text-xs text-text-primary font-bold hover:text-accent-blue transition-colors cursor-pointer"
+                >
+                  <span className="flex items-center space-x-1.5">
+                    <span className="w-1.5 h-1.5 bg-accent-blue rounded-sm"></span>
+                    <span>Type</span>
+                  </span>
+                  <ChevronDown size={14} className={`transform transition-transform ${typeOpen ? "" : "-rotate-90"}`} />
+                </button>
+                {typeOpen && (
+                  <div className="pl-3.5 space-y-1.5">
+                    {allTypes.map(type => (
+                      <label key={type} className="flex items-center space-x-2 font-mono text-xs text-text-slate hover:text-text-primary cursor-pointer select-none">
+                        <input
+                          type="checkbox"
+                          checked={selectedTypes.includes(type)}
+                          onChange={() => handleTypeChange(type)}
+                          className="rounded bg-terminal-inner border-border-line text-accent-blue focus:ring-0 outline-none cursor-pointer"
+                        />
+                        <span>{type.charAt(0) + type.slice(1).toLowerCase()} ({getTypeCount(type)})</span>
+                      </label>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
 
             {/* Accordion: Topic */}
-            <div className="space-y-2.5">
-              <button
-                onClick={() => setTypeTopicOpen(!topicOpen)}
-                className="w-full flex items-center justify-between font-mono text-xs text-text-primary font-bold hover:text-accent-blue transition-colors cursor-pointer"
-              >
-                <span className="flex items-center space-x-1.5">
-                  <span className="w-1.5 h-1.5 bg-accent-mint rounded-sm"></span>
-                  <span>Topic</span>
-                </span>
-                <ChevronDown size={14} className={`transform transition-transform ${topicOpen ? "" : "-rotate-90"}`} />
-              </button>
-              {topicOpen && (
-                <div className="pl-3.5 space-y-1.5 max-h-[260px] overflow-y-auto pr-1">
-                  {allTopics.map(topic => (
-                    <label key={topic} className="flex items-center space-x-2 font-mono text-xs text-text-slate hover:text-text-primary cursor-pointer select-none">
-                      <input
-                        type="checkbox"
-                        checked={selectedTopics.includes(topic)}
-                        onChange={() => handleTopicChange(topic)}
-                        className="rounded bg-terminal-inner border-border-line text-accent-blue focus:ring-0 outline-none cursor-pointer"
-                      />
-                      <span>{topic} ({getTopicCount(topic)})</span>
-                    </label>
-                  ))}
-                </div>
-              )}
-            </div>
+            {allTopics.length > 0 && (
+              <div className="space-y-2.5">
+                <button
+                  onClick={() => setTypeTopicOpen(!topicOpen)}
+                  className="w-full flex items-center justify-between font-mono text-xs text-text-primary font-bold hover:text-accent-blue transition-colors cursor-pointer"
+                >
+                  <span className="flex items-center space-x-1.5">
+                    <span className="w-1.5 h-1.5 bg-accent-mint rounded-sm"></span>
+                    <span>Topic</span>
+                  </span>
+                  <ChevronDown size={14} className={`transform transition-transform ${topicOpen ? "" : "-rotate-90"}`} />
+                </button>
+                {topicOpen && (
+                  <div className="pl-3.5 space-y-1.5 max-h-[260px] overflow-y-auto pr-1">
+                    {allTopics.map(topic => (
+                      <label key={topic} className="flex items-center space-x-2 font-mono text-xs text-text-slate hover:text-text-primary cursor-pointer select-none">
+                        <input
+                          type="checkbox"
+                          checked={selectedTopics.includes(topic)}
+                          onChange={() => handleTopicChange(topic)}
+                          className="rounded bg-terminal-inner border-border-line text-accent-blue focus:ring-0 outline-none cursor-pointer"
+                        />
+                        <span>{topic} ({getTopicCount(topic)})</span>
+                      </label>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
 
             {/* FIG. 3 Interactive Artwork */}
             <div className="border border-border-line/45 rounded-lg bg-terminal-inner/20 p-4 font-mono text-[9px] text-text-slate flex flex-col space-y-2 select-none relative overflow-hidden h-[180px]">
@@ -429,7 +262,6 @@ export default function Feed() {
                 <span className="text-accent-mint">ICM_INDEX</span>
               </div>
               <div className="flex-1 relative flex items-center justify-center">
-                {/* Decorative abstract lines using SVGs */}
                 <svg viewBox="0 0 100 100" className="w-full h-full text-border-line/80 stroke-current stroke-[0.5] fill-none">
                   <line x1="10" y1="10" x2="90" y2="90" />
                   <line x1="90" y1="10" x2="10" y2="90" />
@@ -457,7 +289,21 @@ export default function Feed() {
 
               {/* Table Body */}
               <div className="divide-y divide-border-line/30">
-                {filteredItems.length === 0 ? (
+                {isLoading ? (
+                  Array.from({ length: 5 }).map((_, idx) => (
+                    <div key={idx} className="grid grid-cols-12 px-5 py-4 items-center animate-pulse">
+                      <div className="col-span-2 h-4 bg-border-line/20 rounded w-16"></div>
+                      <div className="col-span-7 sm:col-span-8 h-4 bg-border-line/20 rounded w-2/3"></div>
+                      <div className="col-span-3 sm:col-span-2 flex justify-end">
+                        <div className="h-4 bg-border-line/20 rounded w-12"></div>
+                      </div>
+                    </div>
+                  ))
+                ) : error ? (
+                  <div className="p-8 text-center font-mono text-xs text-red-400">
+                    Error loading feed: {error}
+                  </div>
+                ) : filteredItems.length === 0 ? (
                   <div className="p-8 text-center font-mono text-xs text-text-slate">
                     No matching items found in the feed.
                   </div>
@@ -477,10 +323,15 @@ export default function Feed() {
                         </div>
                         
                         {/* Title */}
-                        <div className="col-span-7 sm:col-span-8 pr-4">
+                        <div className="col-span-7 sm:col-span-8 pr-4 flex items-center space-x-2">
                           <span className="text-sm font-semibold text-white hover:text-accent-mint transition-colors">
                             {item.title}
                           </span>
+                          {item.topics.includes("DRAFT") && (
+                            <span className="px-1.5 py-0.5 rounded border border-accent-yellow/30 text-accent-yellow bg-accent-yellow/5 text-[8px] font-mono font-bold tracking-wider scale-90">
+                              DRAFT
+                            </span>
+                          )}
                         </div>
                         
                         {/* Type & Accordion Action */}

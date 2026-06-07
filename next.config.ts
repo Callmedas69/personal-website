@@ -1,9 +1,10 @@
 import type { NextConfig } from "next";
 
-const nextConfig: NextConfig & { eslint?: { ignoreDuringBuilds: boolean } } = {
+const nextConfig: NextConfig = {
   /* config options here */
-  eslint: {
-    ignoreDuringBuilds: true,
+  outputFileTracingRoot: process.cwd(),
+  turbopack: {
+    root: process.cwd(),
   },
 };
 

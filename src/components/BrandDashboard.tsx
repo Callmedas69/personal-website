@@ -202,7 +202,7 @@ export default function BrandDashboard() {
           }`}
         >
           <Brain size={12} />
-          <span>01_AI-NATIVE</span>
+          <span>01_CONTEXT</span>
         </button>
         <button
           onClick={() => setActiveTab("onchain")}
@@ -250,7 +250,7 @@ export default function BrandDashboard() {
                 <div className="text-[7.5px] text-text-slate mt-0.5">WORKSPACE RULES</div>
               </div>
               <div className="border border-accent-yellow/30 rounded p-2 bg-accent-yellow/5 hover:border-accent-yellow/70 transition-colors cursor-help">
-                <div className="font-semibold text-accent-yellow text-[9px] sm:text-[10px]">Folder Structure</div>
+                <div className="font-semibold text-accent-yellow text-[9px] sm:text-[10px]">FILESYSTEM</div>
                 <div className="text-[7.5px] text-text-slate mt-0.5">WORKFLOW STAGES</div>
               </div>
             </div>
