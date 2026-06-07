@@ -1,7 +1,7 @@
 import AgentTerminal from "@/components/AgentTerminal";
 import InvisibleLawVisualizer from "@/components/InvisibleLawVisualizer";
 import BrandDashboard from "@/components/BrandDashboard";
-import HeaderConnectButton from "@/components/HeaderConnectButton";
+import Header from "@/components/Header";
 
 export default function Home() {
   return (
@@ -11,28 +11,7 @@ export default function Home() {
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-terminal-bg/30 via-brand-bg/95 to-brand-bg pointer-events-none z-0"></div>
       
       {/* Page Header */}
-      <header className="relative z-10 flex items-center justify-between px-6 py-4 max-w-6xl w-full mx-auto select-none border-b border-border-line/40">
-        <div className="flex items-center space-x-2 sm:space-x-3">
-          <div className="font-mono text-sm tracking-widest font-bold text-accent-blue hover:text-accent-mint transition-colors cursor-pointer">
-            0xdas.dev
-          </div>
-          <span className="text-text-slate/40 text-xs">|</span>
-          <div className="flex items-center space-x-1 bg-terminal-inner/60 border border-border-line/60 rounded px-1.5 sm:px-2 py-0.5 text-[9px] font-mono text-accent-mint">
-            <span className="w-1.5 h-1.5 rounded-full bg-accent-mint animate-pulse"></span>
-            <span className="hidden sm:inline">BASE_MAINNET : ONLINE</span>
-            <span className="sm:hidden">ONLINE</span>
-          </div>
-        </div>
-        <div className="flex items-center space-x-3 sm:space-x-5 text-xs text-text-slate font-mono">
-          <a href="https://warpcast.com/0xdas" target="_blank" rel="noopener noreferrer" className="hidden sm:inline hover:text-accent-mint transition-colors">farcaster</a>
-          <span className="hidden sm:inline">·</span>
-          <a href="https://x.com/0xdas" target="_blank" rel="noopener noreferrer" className="hidden sm:inline hover:text-accent-blue transition-colors">twitter</a>
-          <span className="hidden sm:inline">·</span>
-          <a href="https://github.com/0xdas" target="_blank" rel="noopener noreferrer" className="hidden sm:inline hover:text-accent-purple transition-colors">github</a>
-          <span className="hidden sm:inline text-text-slate/40 text-xs">|</span>
-          <HeaderConnectButton />
-        </div>
-      </header>
+      <Header />
 
       {/* Main Grid Layout Space */}
       <main className="relative z-10 flex-1 w-full max-w-6xl mx-auto px-6 py-8 md:py-12">
