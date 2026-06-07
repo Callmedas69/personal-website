@@ -2,10 +2,13 @@
 
 import React from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import HeaderConnectButton from "./HeaderConnectButton";
 import Logo from "./Logo";
 
 export default function Header() {
+  const pathname = usePathname();
+
   return (
     <header className="relative z-10 flex items-center justify-between px-6 py-4 max-w-6xl w-full mx-auto select-none border-b border-border-line/40">
       <div className="flex items-center space-x-2 sm:space-x-3">
@@ -23,7 +26,7 @@ export default function Header() {
         </div>
       </div>
       <div className="flex items-center space-x-3 sm:space-x-5 text-xs text-text-slate font-mono">
-        <Link href="/feed" className="hover:text-accent-yellow transition-colors">
+        <Link href="/feed" className={`transition-colors ${pathname === "/feed" ? "text-accent-yellow font-bold" : "hover:text-accent-yellow"}`}>
           feed
         </Link>
         <span className="text-text-slate/40">·</span>
