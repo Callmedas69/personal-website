@@ -400,7 +400,7 @@ export default function Feed() {
 
       <footer className="relative z-10 py-6 text-center select-none border-t border-border-line/20 mt-auto">
         <p className="font-mono text-[9px] text-text-slate/60">
-          © {new Date().getFullYear()} 0xdas. all rights reserved. built in public on base.
+          0xDas  // the thinking is free.  cognitive. solo. shipping.
         </p>
       </footer>
     </div>
