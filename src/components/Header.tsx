@@ -17,6 +17,9 @@ export default function Header() {
           <span className="font-mono text-sm tracking-widest font-bold text-white group-hover:text-accent-mint transition-colors">
             0xdas.dev
           </span>
+          <span className="hidden lg:inline font-mono text-[10px] text-text-slate/40 ml-1">
+            // the thinking is free.
+          </span>
         </Link>
         <span className="text-text-slate/40 text-xs">|</span>
         <div className="flex items-center space-x-1 bg-terminal-inner/60 border border-border-line/60 rounded px-1.5 sm:px-2 py-0.5 text-[9px] font-mono text-accent-mint">
