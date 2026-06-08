@@ -2,6 +2,7 @@ import AgentTerminal from "@/components/AgentTerminal";
 import InvisibleLawVisualizer from "@/components/InvisibleLawVisualizer";
 import BrandDashboard from "@/components/BrandDashboard";
 import Header from "@/components/Header";
+import OxNull from "@/components/OxNull";
 
 export default function Home() {
   return (
@@ -21,7 +22,7 @@ export default function Home() {
           <div className="lg:col-span-5 flex flex-col space-y-6">
             
             {/* Identity & Positioning Headline */}
-            <div className="space-y-3">
+            <div className="relative space-y-3">
               <div className="font-mono text-xs font-bold text-accent-blue uppercase tracking-widest">
                 [ 0x_Cognitive_Context ]
               </div>
@@ -31,6 +32,9 @@ export default function Home() {
               <p className="font-mono text-xs text-text-slate leading-relaxed">
                 Structuring cognitive workspaces through the filesystem, blending context engineering with math-driven onchain systems.
               </p>
+              <div className="absolute bottom-0 right-8 hidden lg:block opacity-60 hover:opacity-100 transition-opacity">
+                <OxNull mood="thinking" size={96} />
+              </div>
             </div>
 
             {/* Invisible Law Interactive SVG Generative Art */}
@@ -52,7 +56,7 @@ export default function Home() {
       {/* Page Footer */}
       <footer className="relative z-10 py-6 text-center select-none border-t border-border-line/20 mt-auto">
         <p className="font-mono text-[9px] text-text-slate/60">
-          © {new Date().getFullYear()} 0xdas. all rights reserved. built in public on base.
+          0xDas  // the thinking is free.  cognitive. solo. shipping.
         </p>
       </footer>
     </div>
