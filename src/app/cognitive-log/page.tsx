@@ -16,7 +16,7 @@ interface FeedItem {
   excerpt?: string;
 }
 
-export default function Feed() {
+export default function CognitiveLog() {
   const [feedItems, setFeedItems] = useState<FeedItem[]>([]);
   const [filteredItems, setFilteredItems] = useState<FeedItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -158,7 +158,7 @@ export default function Feed() {
         {/* Header row */}
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-8 pb-4 border-b border-border-line/20">
           <div className="flex items-baseline space-x-3">
-            <h1 className="font-sans text-4xl font-extrabold tracking-tight text-white">Feed</h1>
+            <h1 className="font-sans text-4xl font-extrabold tracking-tight text-white">cognitive-log</h1>
             <span className="font-mono text-accent-yellow text-sm font-bold">
               ({filteredItems.length})
             </span>
@@ -301,11 +301,11 @@ export default function Feed() {
                   ))
                 ) : error ? (
                   <div className="p-8 text-center font-mono text-xs text-red-400">
-                    Error loading feed: {error}
+                    Error loading cognitive-log: {error}
                   </div>
                 ) : filteredItems.length === 0 ? (
                   <div className="p-8 text-center font-mono text-xs text-text-slate">
-                    No matching items found in the feed.
+                    No matching items found in the cognitive-log.
                   </div>
                 ) : (
                   filteredItems.map(item => (

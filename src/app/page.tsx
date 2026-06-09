@@ -28,22 +28,17 @@ export default function Home() {
               </div>
 
               <h1 className="font-sans text-2xl md:text-3xl font-extrabold tracking-tight text-white leading-tight">
-                The thinking is free.<br />
-                <span className="text-accent-blue">The output ships on Base.</span>
+                the ideas are loud<br />
+                <span className="text-accent-blue">the button is hard</span>
               </h1>
 
-              <p className="font-mono text-xs text-text-slate leading-relaxed max-w-sm">
-                Anyone can show a deploy. Nobody shows the moment before they almost quit.
-                Five years onchain — here&apos;s the thinking.
+              <p className="font-mono text-sm text-text-slate leading-relaxed">
+                anyone can show a deploy. nobody shows the moment before they almost quit.
               </p>
 
               <p className="font-mono text-[10px] text-text-slate/50 tracking-widest">
                 cognitive. solo. shipping.
               </p>
-
-              <div className="absolute bottom-0 right-0 hidden md:block opacity-60 hover:opacity-100 transition-opacity">
-                <OxNull mood="thinking" size={88} />
-              </div>
             </div>
 
             {/* 0xNull mood panel */}
@@ -64,7 +59,7 @@ export default function Home() {
 
       <footer className="relative z-10 py-6 text-center select-none border-t border-border-line/20 mt-auto">
         <p className="font-mono text-[9px] text-text-slate/60">
-          // the thinking is free. — 0xDas▋
+          // the thinking is free - 0xDas▋
         </p>
       </footer>
     </div>

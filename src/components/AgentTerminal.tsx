@@ -4,15 +4,11 @@ import React, { useState, useRef, useEffect } from "react";
 import { AlertTriangle, Cpu, Command, Send } from "lucide-react";
 import { gsap } from "gsap";
 import { useGSAP } from "@gsap/react";
+import MoodBadge from "./terminal/MoodBadge";
+import { resolveCommand } from "./terminal/commands";
+import type { LogEntry, MoodState } from "./terminal/types";
 
-// Register useGSAP
 gsap.registerPlugin(useGSAP);
-
-interface LogEntry {
-  command?: string;
-  response: string;
-  isHTML?: boolean;
-}
 
 export default function AgentTerminal() {
   const [inputVal, setInputVal] = useState("");
@@ -23,6 +19,8 @@ export default function AgentTerminal() {
   // Command History States
   const [history, setHistory] = useState<string[]>([]);
   const [historyIdx, setHistoryIdx] = useState(-1);
+  const [currentMood, setCurrentMood] = useState<MoodState>("shipping");
+  const [isStreamingHTML, setIsStreamingHTML] = useState(true);
   
   const terminalRef = useRef<HTMLDivElement>(null);
   const logsContainerRef = useRef<HTMLDivElement>(null);
@@ -87,163 +85,40 @@ export default function AgentTerminal() {
 
   // Command Router Engine
   const executeCommand = async (cmd: string) => {
-    if (isTyping) return; // Block input while response is streaming
-    
-    const sanitizedCmd = cmd.trim().toLowerCase();
-    let response = "";
-    let isHTML = false;
+    if (isTyping) return;
 
-    if (sanitizedCmd === "clear" || sanitizedCmd === "/clear") {
+    const trimmed = cmd.trim();
+    if (!trimmed) return;
+
+    const result = resolveCommand(trimmed);
+    if (!result) return;
+
+    if (result.clear) {
       setLogs([]);
       setInputVal("");
       setHistoryIdx(-1);
       return;
     }
 
-    if (sanitizedCmd === "") {
-      return;
-    }
-
-    // Add to history
     setHistory(prev => [cmd, ...prev]);
     setHistoryIdx(-1);
 
-    // Process commands
-    switch (true) {
-      case sanitizedCmd === "/help" || sanitizedCmd === "help":
-        isHTML = true;
-        response = `
-<div class="space-y-2 font-mono text-text-slate">
-  <div class="text-accent-yellow font-bold uppercase mb-1">=== COGNITIVE ENTRY POINTS ===</div>
-  <div><span class="text-accent-mint font-semibold">/stack</span>     - View technical skill pillars (AI, Onchain)</div>
-  <div><span class="text-accent-mint font-semibold">/projects</span>  - Inspect signature work (BasedMining, InvisibleLaw, Vault)</div>
-  <div><span class="text-accent-mint font-semibold">/archives</span>  - Browse previous experiments and past builds</div>
-  <div><span class="text-accent-mint font-semibold">/status</span>    - Verify current developer availability</div>
-  <div><span class="text-accent-mint font-semibold">/socials</span>   - Get socials coordinate (Farcaster, X, GitHub)</div>
-  <div><span class="text-accent-mint font-semibold">/clear</span>     - Clear console screen</div>
-</div>`;
-        break;
-
-      case sanitizedCmd === "/stack" || sanitizedCmd === "stack" || sanitizedCmd.includes("stack") || sanitizedCmd.includes("skill"):
-        isHTML = true;
-        response = `
-<div class="space-y-3 font-mono">
-  <div>
-    <span class="text-accent-blue font-bold">[ AI-NATIVE SYSTEMS ]</span>
-    <ul class="list-disc list-inside text-text-slate ml-2 mt-1 space-y-0.5">
-      <li>LLM Context Ops & prompt engineering (<span class="text-accent-yellow">CLAUDE.md</span> boundary logic)</li>
-      <li>Obsidian Vault architecture for startup productivity</li>
-      <li>Agentic workflows and automated developer briefings</li>
-    </ul>
-  </div>
-  <div>
-    <span class="text-accent-purple font-bold">[ ONCHAIN ENGINEERING ]</span>
-    <ul class="list-disc list-inside text-text-slate ml-2 mt-1 space-y-0.5">
-      <li>Fully onchain metadata & SVG contract renderers</li>
-      <li>Smart contract development (Solidity on <span class="text-accent-blue font-semibold">Base</span>)</li>
-      <li>Client integration via viem, wagmi, ethers</li>
-    </ul>
-  </div>
-  <div>
-    <span class="text-accent-mint font-bold">[ CREATIVE FRONTEND ]</span>
-    <ul class="list-disc list-inside text-text-slate ml-2 mt-1 space-y-0.5">
-      <li>React, Next.js (App Router), and TypeScript</li>
-      <li>Complex UI animations using <span class="text-accent-yellow font-semibold">GSAP Timelines</span> & spring physics</li>
-      <li>Utility-first styling with Tailwind CSS v4 design variables</li>
-    </ul>
-  </div>
-</div>`;
-        break;
-
-      case sanitizedCmd === "/projects" || sanitizedCmd === "projects" || sanitizedCmd.includes("project") || sanitizedCmd.includes("work"):
-        isHTML = true;
-        response = `
-<div class="space-y-3 font-mono text-text-slate">
-  <div>
-    <span class="text-accent-green font-bold">1. BASEDMINING</span> <span class="text-[10px] text-text-slate/60">(Active client work)</span>
-    <div class="ml-2 mt-0.5 text-text-primary">Content automation & video rendering pipeline.</div>
-    <div class="ml-2 text-[10px]">Stack: Remotion, Node.js.</div>
-  </div>
-  <div>
-    <span class="text-accent-green font-bold">2. ARCNOTIFY</span> <span class="text-[10px] text-text-slate/60">(Under development)</span>
-    <div class="ml-2 mt-0.5 text-text-primary">Webhook notification service for Arc L1.</div>
-    <div class="ml-2 text-[10px]">Stack: Next.js, Neon/Drizzle, Upstash QStash, Clerk, Resend, Viem.</div>
-  </div>
-  <div>
-    <span class="text-accent-green font-bold">3. COGNITIVE VAULT</span> <span class="text-[10px] text-text-slate/60">(Internal tools)</span>
-    <div class="ml-2 mt-0.5 text-text-primary">AI context engineering layer managing Obsidian shared brain.</div>
-    <div class="ml-2 text-[10px]">Stack: ContextOps routing, prompt mapping, daily hooks.</div>
-  </div>
-</div>`;
-        break;
-
-      case sanitizedCmd === "/status" || sanitizedCmd === "status" || sanitizedCmd.includes("available") || sanitizedCmd.includes("availability"):
-        isHTML = true;
-        response = `
-<div class="font-mono space-y-1 text-text-slate">
-  <div><span class="text-text-primary">Status:</span> <span class="text-accent-mint font-semibold">Active</span> building autonomous agents on Base.</div>
-  <div><span class="text-text-primary">Availability:</span> Open for high-leverage consulting or technical advisory roles at the intersection of AI + Onchain.</div>
-  <div><span class="text-text-primary">Ecosystem:</span> Base / Ethereum L2s</div>
-</div>`;
-        break;
-
-      case sanitizedCmd === "/archives" || sanitizedCmd === "archives" || sanitizedCmd.includes("archive") || sanitizedCmd.includes("past") || sanitizedCmd.includes("previous"):
-        isHTML = true;
-        response = `
-<div class="space-y-3 font-mono text-text-slate">
-  <div class="text-accent-yellow font-bold uppercase mb-1">=== PREVIOUS BUILDS ===</div>
-  <div>
-    <span class="text-accent-blue font-bold">[ ON HOLD ]</span>
-    <div class="ml-2 mt-1 space-y-1.5">
-      <div><span class="text-text-primary font-semibold">Invisible Law</span> <span class="text-[10px] text-text-slate/60">(ERC-721)</span><div class="ml-2 text-[10px]">Generative geometric bauhaus art by implementing golden ratio as a law.</div></div>
-      <div><span class="text-text-primary font-semibold">Judith</span> <span class="text-[10px] text-text-slate/60">(AI Tool)</span><div class="ml-2 text-[10px]">Public accountability website targeting Bankr.bot. AI-drafted escalations posted publicly on Twitter/X and a permanent wall of shame.</div></div>
-      <div><span class="text-text-primary font-semibold">The ARC Academy</span> <span class="text-[10px] text-text-slate/60">(Platform)</span><div class="ml-2 text-[10px]">Financial literacy platform for Gen Alpha. Structured curriculum delivery with interactive progress tracking.</div></div>
-    </div>
-  </div>
-  <div>
-    <span class="text-accent-purple font-bold">[ ARCHIVED ]</span>
-    <div class="ml-2 mt-1 space-y-1.5">
-      <div><span class="text-text-primary font-semibold">BaseCred</span> <span class="text-[10px] text-text-slate/60">(DeFi)</span><div class="ml-2 text-[10px]">Decision engine on aggregated onchain reputation (ethos, neynar, and talent protocol).</div></div>
-      <div><span class="text-text-primary font-semibold">Lore</span> <span class="text-[10px] text-text-slate/60">(Mini-App)</span><div class="ml-2 text-[10px]">Farcaster mini-app and frame (Winter Resonance). AI-rephrased winter mantras with onchain sealing.</div></div>
-      <div><span class="text-text-primary font-semibold">Phi</span> <span class="text-[10px] text-text-slate/60">(Solidity)</span><div class="ml-2 text-[10px]">Solidity contracts for Invisible Law. Fully onchain SVG generation engine using mathematical Phi libraries.</div></div>
-      <div><span class="text-text-primary font-semibold">Geoplet ERC-721</span> <span class="text-[10px] text-text-slate/60">(NFT)</span><div class="ml-2 text-[10px]">Warplet transformation into geometric bauhaus style.</div></div>
-    </div>
-  </div>
-</div>`;
-        break;
-
-      case sanitizedCmd === "/socials" || sanitizedCmd === "socials" || sanitizedCmd.includes("social") || sanitizedCmd.includes("contact") || sanitizedCmd.includes("github") || sanitizedCmd.includes("twitter") || sanitizedCmd.includes("warpcast") || sanitizedCmd.includes("farcaster"):
-        isHTML = true;
-        response = `
-<div class="font-mono space-y-2 text-text-slate">
-  <div class="text-accent-blue font-bold uppercase mb-1">=== SOCIAL COORDINATES ===</div>
-  <div>Farcaster: <a href="https://warpcast.com/0xdas" target="_blank" rel="noopener noreferrer" class="text-accent-mint hover:underline font-semibold">warpcast.com/0xdas</a> <span class="text-xs text-text-slate/60">(4k followers)</span></div>
-  <div>Twitter/X: <a href="https://x.com/0xdas" target="_blank" rel="noopener noreferrer" class="text-accent-mint hover:underline font-semibold">x.com/0xdas</a></div>
-  <div>GitHub: <a href="https://github.com/0xdas" target="_blank" rel="noopener noreferrer" class="text-accent-mint hover:underline font-semibold">github.com/0xdas</a></div>
-</div>`;
-        break;
-
-      default:
-        response = `Command not found: "${cmd}". Type /help to see available coordinates.`;
-        break;
-    }
-
-    // Set temporary state for user input log entry
-    const newLogIndex = logs.length;
-    setLogs((prev) => [...prev, { command: cmd, response: "" }]);
+    setLogs(prev => [...prev, { command: cmd, response: "" }]);
     setInputVal("");
 
-    // Stream response
-    await streamText(response, isHTML);
+    setCurrentMood(result.mood);
+    setIsStreamingHTML(result.isHTML);
+    await streamText(result.response, result.isHTML);
 
-    // Save final response in output log state
-    setLogs((prev) => {
+    setLogs(prev => {
       const updated = [...prev];
-      if (updated[newLogIndex]) {
-        updated[newLogIndex] = {
+      const target = updated.length - 1;
+      if (updated[target]?.command === cmd) {
+        updated[target] = {
           command: cmd,
-          response: response,
-          isHTML: isHTML,
+          response: result.response,
+          isHTML: result.isHTML,
+          mood: result.mood,
         };
       }
       return updated;
@@ -304,16 +179,16 @@ export default function AgentTerminal() {
         </div>
         <div className="flex items-center text-xs text-text-slate font-mono space-x-1">
           <Cpu size={12} className="text-accent-mint animate-pulse" />
-          <span className="hidden sm:inline">talk-to-my-agent v1.1.0</span>
+          <span className="hidden sm:inline">0xNull</span>
         </div>
       </div>
 
       {/* Terminal Screen Info Bar */}
       <div className="px-4 py-1.5 bg-terminal-inner/30 border-b border-border-line text-[11px] font-mono text-text-slate flex justify-between select-none">
         <div>
-          <span className="hidden sm:inline">talk-to-my-agent · </span>v1.1.0 · base-mainnet
+          <span className="hidden sm:inline">0xNull · </span>
         </div>
-        <div>UTC+7</div>
+        <div>v1.1.0</div>
       </div>
 
       {/* Log Console Space */}
@@ -325,10 +200,11 @@ export default function AgentTerminal() {
         <div className="space-y-3">
           <div className="flex items-center space-x-2 text-accent-blue text-xl font-bold">
             <span>welcome.</span>
-            <span className="inline-block w-2.5 h-5 bg-accent-blue animate-cursor"></span>
           </div>
-          <div className="text-text-slate leading-relaxed max-w-xl text-[13px]">
-            trained on five years of onchain development, and the patient art of building autonomous agents that don&apos;t drain their wallets six blocks later.
+          <div className="text-text-slate leading-relaxed max-w-xl text-[13px] space-y-0.5">
+            <div>the ideas never stopped. the button was just hard.</div>
+            <div>the thinking is free. the agent is live.</div>
+            <div className="text-text-slate/50">// you&apos;re talking to 0xNull.</div>
           </div>
           <div className="flex items-center space-x-1.5 text-xs text-text-slate bg-terminal-bg/40 border border-border-line rounded px-3 py-1.5 w-fit">
             <AlertTriangle size={12} className="text-accent-yellow" />
@@ -342,7 +218,7 @@ export default function AgentTerminal() {
             <div key={idx} className="space-y-1.5">
               {log.command && (
                 <div className="flex items-start space-x-2">
-                  <span className="text-accent-green font-bold">client@0xdas</span>
+                  <span className="text-accent-green font-bold">0xNull@0xdas</span>
                   <span className="text-text-slate">~</span>
                   <span className="text-accent-blue font-bold">%</span>
                   <span className="text-text-primary font-semibold">{log.command}</span>
@@ -350,6 +226,11 @@ export default function AgentTerminal() {
               )}
               {log.response && (
                 <div className="pl-4 border-l border-border-line/45">
+                  {log.mood && (
+                    <div className="mb-1">
+                      <MoodBadge mood={log.mood} />
+                    </div>
+                  )}
                   {log.isHTML ? (
                     <div dangerouslySetInnerHTML={{ __html: log.response }} />
                   ) : (
@@ -364,7 +245,14 @@ export default function AgentTerminal() {
           {isTyping && (
             <div className="space-y-1.5">
               <div className="pl-4 border-l border-border-line/45">
-                <div dangerouslySetInnerHTML={{ __html: currentResponseStream }} />
+                <div className="mb-1">
+                  <MoodBadge mood={currentMood} />
+                </div>
+                {isStreamingHTML ? (
+                  <div dangerouslySetInnerHTML={{ __html: currentResponseStream }} />
+                ) : (
+                  <div className="whitespace-pre-wrap text-text-slate leading-relaxed">{currentResponseStream}</div>
+                )}
                 <span className="inline-block w-2.5 h-4 bg-accent-mint animate-cursor ml-1"></span>
               </div>
             </div>
@@ -414,7 +302,7 @@ export default function AgentTerminal() {
         className="flex items-center px-4 py-3 bg-terminal-inner border-t border-border-line select-none"
       >
         <div className="flex items-center space-x-1.5 text-xs font-mono">
-          <span className="text-accent-green font-bold hidden sm:inline">client@0xdas</span>
+          <span className="text-accent-green font-bold hidden sm:inline">0xNull@0xdas</span>
           <span className="text-text-slate hidden sm:inline">~</span>
           <span className="text-accent-blue font-bold">%</span>
         </div>
@@ -425,7 +313,7 @@ export default function AgentTerminal() {
           onChange={(e) => setInputVal(e.target.value.slice(0, 200))}
           onKeyDown={handleKeyDown}
           disabled={isTyping}
-          placeholder={isTyping ? "agent is responding..." : "ask your agent a question..."}
+          placeholder={isTyping ? "agent is responding..." : "ask 0xNull a question..."}
           className="flex-1 bg-transparent border-none outline-none font-mono text-sm ml-2.5 text-text-primary placeholder-text-slate/60 disabled:cursor-not-allowed"
           autoFocus
         />
