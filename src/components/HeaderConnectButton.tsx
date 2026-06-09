@@ -54,11 +54,11 @@ export default function HeaderConnectButton() {
               }
 
               return (
-                <div className="flex items-center space-x-2 font-mono text-[11px]">
+                <div className="flex items-center gap-2 font-mono text-[11px]">
                   <button
                     onClick={openChainModal}
                     type="button"
-                    className="px-2 py-0.5 rounded border border-border-line text-text-slate hover:text-text-primary transition-all cursor-pointer select-none"
+                    className="hidden sm:block px-2 py-0.5 rounded border border-border-line text-text-slate hover:text-text-primary transition-all cursor-pointer select-none"
                   >
                     {chain.name}
                   </button>

@@ -1,33 +1,113 @@
 "use client";
 
 import React, { useState, useRef, useEffect } from "react";
-import { AlertTriangle, Cpu, Command, Send } from "lucide-react";
+import { AlertTriangle, Command, Send } from "lucide-react";
 import { gsap } from "gsap";
 import { useGSAP } from "@gsap/react";
 import MoodBadge from "./terminal/MoodBadge";
+import OxNull from "./OxNull";
 import { resolveCommand } from "./terminal/commands";
+import { MOOD_CONFIG } from "./terminal/types";
 import type { LogEntry, MoodState } from "./terminal/types";
 
 gsap.registerPlugin(useGSAP);
+
+const THEMES: Record<MoodState, Record<string, string>> = {
+  thinking: {
+    "--color-brand-bg":       "#011627",
+    "--color-terminal-bg":    "#011627",
+    "--color-terminal-inner": "#070d19",
+    "--color-text-primary":   "#d8dee9",
+    "--color-text-slate":     "#5f7d97",
+    "--color-accent-blue":    "#6e9cf1",
+    "--color-border-line":    "rgba(192,199,209,0.12)",
+  },
+  shipping: {
+    "--color-brand-bg":       "#011a08",
+    "--color-terminal-bg":    "#011a08",
+    "--color-terminal-inner": "#030f05",
+    "--color-text-primary":   "#d4ead8",
+    "--color-text-slate":     "#4a7a58",
+    "--color-accent-blue":    "#aae87b",
+    "--color-border-line":    "rgba(170,232,123,0.12)",
+  },
+  broke: {
+    "--color-brand-bg":       "#1a0608",
+    "--color-terminal-bg":    "#1a0608",
+    "--color-terminal-inner": "#110405",
+    "--color-text-primary":   "#ead8d9",
+    "--color-text-slate":     "#7a4a50",
+    "--color-accent-blue":    "#f87171",
+    "--color-border-line":    "rgba(248,113,113,0.12)",
+  },
+  flow: {
+    "--color-brand-bg":       "#010f1a",
+    "--color-terminal-bg":    "#010f1a",
+    "--color-terminal-inner": "#050c15",
+    "--color-text-primary":   "#d8eaed",
+    "--color-text-slate":     "#3d7080",
+    "--color-accent-blue":    "#60d0ff",
+    "--color-border-line":    "rgba(96,208,255,0.12)",
+  },
+};
+
+const THEME_DOTS: { id: MoodState; color: string }[] = [
+  { id: "thinking", color: "#6e9cf1" },
+  { id: "shipping", color: "#aae87b" },
+  { id: "broke",    color: "#f87171" },
+  { id: "flow",     color: "#60d0ff" },
+];
 
 export default function AgentTerminal() {
   const [inputVal, setInputVal] = useState("");
   const [logs, setLogs] = useState<LogEntry[]>([]);
   const [isTyping, setIsTyping] = useState(false);
   const [currentResponseStream, setCurrentResponseStream] = useState("");
-  
-  // Command History States
+
   const [history, setHistory] = useState<string[]>([]);
   const [historyIdx, setHistoryIdx] = useState(-1);
   const [currentMood, setCurrentMood] = useState<MoodState>("shipping");
   const [isStreamingHTML, setIsStreamingHTML] = useState(true);
-  
+
+  const [themeMood, setThemeMood] = useState<MoodState>("thinking");
+
   const terminalRef = useRef<HTMLDivElement>(null);
   const logsContainerRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const mascotRef = useRef<HTMLDivElement>(null);
 
-  // Entrance animation for the terminal
+  // Restore theme from localStorage on mount
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem("0xnull-theme") as MoodState | null;
+      if (saved && Object.keys(THEMES).includes(saved)) {
+        setThemeMood(saved);
+        document.documentElement.dataset.theme = saved;
+      }
+    } catch {}
+  }, []);
+
+  const selectMood = (id: MoodState) => {
+    setThemeMood(id);
+    document.documentElement.dataset.theme = id;
+    try { localStorage.setItem("0xnull-theme", id); } catch {}
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (reduced) {
+      Object.entries(THEMES[id]).forEach(([k, v]) =>
+        document.documentElement.style.setProperty(k, v)
+      );
+    } else {
+      gsap.to(document.documentElement, {
+        ...THEMES[id],
+        duration: 0.55,
+        ease: "power3.inOut",
+      });
+    }
+  };
+
+  // Terminal entrance animation
   useGSAP(() => {
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     gsap.from(terminalRef.current, {
       opacity: 0,
       y: 30,
@@ -36,32 +116,44 @@ export default function AgentTerminal() {
     });
   }, { scope: terminalRef });
 
-  // Auto-scroll to bottom of logs when log entries change
+  // Mascot talking animation — bounces while streaming
+  useGSAP(() => {
+    if (!mascotRef.current) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    if (isTyping) {
+      gsap.to(mascotRef.current, {
+        y: -4,
+        yoyo: true,
+        repeat: -1,
+        duration: 0.25,
+        ease: "power2.inOut",
+      });
+    } else {
+      gsap.killTweensOf(mascotRef.current);
+      gsap.to(mascotRef.current, { y: 0, duration: 0.15, ease: "power2.out" });
+    }
+  }, { scope: terminalRef, dependencies: [isTyping] });
+
   useEffect(() => {
     if (logsContainerRef.current) {
       logsContainerRef.current.scrollTop = logsContainerRef.current.scrollHeight;
     }
   }, [logs, currentResponseStream]);
 
-  // Focus input on console click
   const handleConsoleClick = () => {
-    if (inputRef.current) {
-      inputRef.current.focus();
-    }
+    if (inputRef.current) inputRef.current.focus();
   };
 
-  // Helper to stream typing text in terminal
   const streamText = async (text: string, isHTML: boolean = false) => {
     setIsTyping(true);
     setCurrentResponseStream("");
-    
+
     let currentIdx = 0;
-    const intervalTime = 6; // Speed up streaming slightly
-    
+    const intervalTime = 6;
+
     return new Promise<void>((resolve) => {
       const timer = setInterval(() => {
         if (currentIdx < text.length) {
-          // If HTML, stream larger chunks to avoid broken tags during load
           if (isHTML && text[currentIdx] === "<") {
             const closingAngleIdx = text.indexOf(">", currentIdx);
             if (closingAngleIdx !== -1) {
@@ -71,7 +163,6 @@ export default function AgentTerminal() {
               return;
             }
           }
-          
           setCurrentResponseStream((prev) => prev + text[currentIdx]);
           currentIdx++;
         } else {
@@ -83,7 +174,6 @@ export default function AgentTerminal() {
     });
   };
 
-  // Command Router Engine
   const executeCommand = async (cmd: string) => {
     if (isTyping) return;
 
@@ -102,7 +192,6 @@ export default function AgentTerminal() {
 
     setHistory(prev => [cmd, ...prev]);
     setHistoryIdx(-1);
-
     setLogs(prev => [...prev, { command: cmd, response: "" }]);
     setInputVal("");
 
@@ -128,18 +217,13 @@ export default function AgentTerminal() {
 
   const handleFormSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (inputVal.trim() && !isTyping) {
-      executeCommand(inputVal);
-    }
+    if (inputVal.trim() && !isTyping) executeCommand(inputVal);
   };
 
   const handleSuggestionClick = (cmd: string) => {
-    if (!isTyping) {
-      executeCommand(cmd);
-    }
+    if (!isTyping) executeCommand(cmd);
   };
 
-  // Keyboard navigation for command history (Up/Down Arrow)
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "ArrowUp") {
       e.preventDefault();
@@ -162,41 +246,56 @@ export default function AgentTerminal() {
   };
 
   return (
-    <div 
+    <div
       ref={terminalRef}
       className="terminal-glow scanlines relative w-full h-[620px] rounded-lg border border-border-line bg-terminal-bg flex flex-col overflow-hidden text-sm"
       onClick={handleConsoleClick}
     >
-      {/* Terminal Title Bar */}
+      {/* Title Bar */}
       <div className="flex items-center justify-between px-4 py-2 bg-terminal-bg border-b border-border-line select-none">
         <div className="flex space-x-1.5">
-          <div className="w-2.5 h-2.5 rounded-full bg-red-500/20 border border-red-500/40"></div>
-          <div className="w-2.5 h-2.5 rounded-full bg-yellow-500/20 border border-yellow-500/40"></div>
-          <div className="w-2.5 h-2.5 rounded-full bg-green-500/20 border border-green-500/40"></div>
+          <div className="w-2.5 h-2.5 rounded-full bg-red-500/20 border border-red-500/40" />
+          <div className="w-2.5 h-2.5 rounded-full bg-yellow-500/20 border border-yellow-500/40" />
+          <div className="w-2.5 h-2.5 rounded-full bg-green-500/20 border border-green-500/40" />
         </div>
         <div className="text-xs font-mono font-bold text-accent-blue tracking-wide">
-          -- 0xdas.dev --
+          [ 0xdas.dev ]
         </div>
-        <div className="flex items-center text-xs text-text-slate font-mono space-x-1">
-          <Cpu size={12} className="text-accent-mint animate-pulse" />
-          <span className="hidden sm:inline">0xNull</span>
+        <div className="text-xs font-mono text-text-slate/60">0xNull</div>
+      </div>
+
+      {/* Mascot Bar — RPG portrait + mood label + theme dots */}
+      <div className="flex items-center justify-between px-4 py-2.5 bg-terminal-inner border-b border-border-line select-none">
+        <div className="flex items-center gap-3">
+          <div ref={mascotRef}>
+            <OxNull mood={currentMood} size={40} />
+          </div>
+          <span className={`font-mono text-[10px] ${isTyping ? MOOD_CONFIG[currentMood].colorClass : MOOD_CONFIG[themeMood].colorClass}`}>
+            {isTyping ? "// responding..." : `// ${MOOD_CONFIG[themeMood].label}`}
+          </span>
+        </div>
+        <div className="flex items-center gap-1.5">
+          {THEME_DOTS.map(({ id, color }) => (
+            <button
+              key={id}
+              onClick={(e) => { e.stopPropagation(); selectMood(id); }}
+              title={id}
+              className="w-2.5 h-2.5 rounded-full transition-all duration-150 hover:scale-125 cursor-pointer"
+              style={{
+                backgroundColor: color,
+                opacity: themeMood === id ? 1 : 0.3,
+                boxShadow: themeMood === id ? `0 0 6px ${color}` : "none",
+              }}
+            />
+          ))}
         </div>
       </div>
 
-      {/* Terminal Screen Info Bar */}
-      <div className="px-4 py-1.5 bg-terminal-inner/30 border-b border-border-line text-[11px] font-mono text-text-slate flex justify-between select-none">
-        <div>
-          <span className="hidden sm:inline">0xNull · </span>
-        </div>
-        <div>v1.1.0</div>
-      </div>
-
-      {/* Log Console Space */}
-      <div 
+      {/* Log Console */}
+      <div
         ref={logsContainerRef}
         className="flex-1 p-5 overflow-y-auto font-mono bg-terminal-inner text-text-primary space-y-4 cursor-text"
       >
-        {/* Welcome Section */}
         <div className="space-y-3">
           <div className="flex items-center space-x-2 text-accent-blue text-xl font-bold">
             <span>welcome.</span>
@@ -212,7 +311,6 @@ export default function AgentTerminal() {
           </div>
         </div>
 
-        {/* Console Command Logs */}
         <div className="space-y-4 pt-2">
           {logs.map((log, idx) => (
             <div key={idx} className="space-y-1.5">
@@ -241,7 +339,6 @@ export default function AgentTerminal() {
             </div>
           ))}
 
-          {/* Currently Streaming Response */}
           {isTyping && (
             <div className="space-y-1.5">
               <div className="pl-4 border-l border-border-line/45">
@@ -253,41 +350,41 @@ export default function AgentTerminal() {
                 ) : (
                   <div className="whitespace-pre-wrap text-text-slate leading-relaxed">{currentResponseStream}</div>
                 )}
-                <span className="inline-block w-2.5 h-4 bg-accent-mint animate-cursor ml-1"></span>
+                <span className="inline-block w-2.5 h-4 bg-accent-mint animate-cursor ml-1" />
               </div>
             </div>
           )}
         </div>
       </div>
 
-      {/* Suggested Quick Commands */}
+      {/* Quick Commands */}
       <div className="px-4 py-2.5 bg-terminal-bg border-t border-border-line flex flex-wrap gap-2 items-center select-none">
         <span className="text-[11px] font-mono text-text-slate mr-1 flex items-center gap-1">
           <Command size={10} />
           $ try &gt;
         </span>
-        <button 
+        <button
           onClick={() => handleSuggestionClick("/stack")}
           disabled={isTyping}
           className="px-2 py-0.5 rounded text-xs font-mono border border-border-line text-accent-blue bg-terminal-inner/40 hover:bg-accent-blue/10 hover:border-accent-blue/40 transition-colors disabled:opacity-40"
         >
           [ /stack ]
         </button>
-        <button 
+        <button
           onClick={() => handleSuggestionClick("/projects")}
           disabled={isTyping}
           className="px-2 py-0.5 rounded text-xs font-mono border border-border-line text-accent-yellow bg-terminal-inner/40 hover:bg-accent-yellow/10 hover:border-accent-yellow/40 transition-colors disabled:opacity-40"
         >
           [ /projects ]
         </button>
-        <button 
+        <button
           onClick={() => handleSuggestionClick("/archives")}
           disabled={isTyping}
           className="px-2 py-0.5 rounded text-xs font-mono border border-border-line text-accent-purple bg-terminal-inner/40 hover:bg-accent-purple/10 hover:border-accent-purple/40 transition-colors disabled:opacity-40"
         >
           [ /archives ]
         </button>
-        <button 
+        <button
           onClick={() => handleSuggestionClick("/help")}
           disabled={isTyping}
           className="px-2 py-0.5 rounded text-xs font-mono border border-border-line text-accent-purple bg-terminal-inner/40 hover:bg-accent-purple/10 hover:border-accent-purple/40 transition-colors disabled:opacity-40"
@@ -296,8 +393,8 @@ export default function AgentTerminal() {
         </button>
       </div>
 
-      {/* Console Input Footer Prompt */}
-      <form 
+      {/* Input */}
+      <form
         onSubmit={handleFormSubmit}
         className="flex items-center px-4 py-3 bg-terminal-inner border-t border-border-line select-none"
       >
@@ -306,9 +403,9 @@ export default function AgentTerminal() {
           <span className="text-text-slate hidden sm:inline">~</span>
           <span className="text-accent-blue font-bold">%</span>
         </div>
-        <input 
+        <input
           ref={inputRef}
-          type="text" 
+          type="text"
           value={inputVal}
           onChange={(e) => setInputVal(e.target.value.slice(0, 200))}
           onKeyDown={handleKeyDown}
@@ -324,8 +421,8 @@ export default function AgentTerminal() {
           <span className="w-12 text-right text-[11px]">
             {inputVal.length}/200
           </span>
-          <button 
-            type="submit" 
+          <button
+            type="submit"
             disabled={!inputVal.trim() || isTyping}
             className="text-text-slate hover:text-accent-mint transition-colors disabled:opacity-45 disabled:hover:text-text-slate cursor-pointer"
           >

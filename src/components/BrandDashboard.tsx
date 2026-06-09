@@ -177,15 +177,15 @@ export default function BrandDashboard() {
   }
 
   // Button background & text color
-  let buttonBgColor = "#fec97d"; // Default accent yellow
-  let buttonTextColor = "#011627";
+  let buttonBgColor = "var(--color-accent-yellow)";
+  let buttonTextColor = "var(--color-terminal-bg)";
   if (buttonDisabled) {
     if (isPending || isConfirming) {
-      buttonBgColor = "#244e56"; // Muted teal during minting
-      buttonTextColor = "#75d1c4";
+      buttonBgColor = "#244e56";
+      buttonTextColor = "var(--color-accent-mint)";
     } else {
-      buttonBgColor = "#0d1b2a"; // Dark greyish-blue when disabled
-      buttonTextColor = "#5f7d97";
+      buttonBgColor = "var(--color-terminal-inner)";
+      buttonTextColor = "var(--color-text-slate)";
     }
   }
 
@@ -196,8 +196,8 @@ export default function BrandDashboard() {
         <button
           onClick={() => setActiveTab("ai")}
           className={`flex-1 py-3 text-center text-xs font-mono font-bold flex items-center justify-center space-x-1.5 border-r border-border-line transition-colors cursor-pointer ${
-            activeTab === "ai" 
-              ? "bg-terminal-inner text-accent-blue border-b-2 border-b-accent-blue" 
+            activeTab === "ai"
+              ? "bg-accent-blue/10 text-accent-blue"
               : "text-text-slate hover:text-text-primary hover:bg-terminal-inner/20"
           }`}
         >
@@ -207,8 +207,8 @@ export default function BrandDashboard() {
         <button
           onClick={() => setActiveTab("onchain")}
           className={`flex-1 py-3 text-center text-xs font-mono font-bold flex items-center justify-center space-x-1.5 transition-colors cursor-pointer ${
-            activeTab === "onchain" 
-              ? "bg-terminal-inner text-accent-yellow border-b-2 border-b-accent-yellow" 
+            activeTab === "onchain"
+              ? "bg-accent-yellow/10 text-accent-yellow"
               : "text-text-slate hover:text-text-primary hover:bg-terminal-inner/20"
           }`}
         >
@@ -223,20 +223,21 @@ export default function BrandDashboard() {
         {/* Tab 1: AI Node Graph */}
         {activeTab === "ai" && (
           <div className="space-y-4 h-full flex flex-col justify-between">
-            <div className="font-mono text-xs text-text-slate leading-relaxed">
-              <span className="text-accent-blue font-bold block mb-1">
-                <a 
-                  href="https://arxiv.org/html/2603.16021v2" 
-                  target="_blank" 
-                  rel="noopener noreferrer" 
-                  className="hover:underline cursor-pointer"
+            <div className="bg-terminal-bg/60 border border-border-line rounded p-3 font-mono text-[10px] text-text-slate space-y-1">
+              <div className="text-accent-blue">I don&apos;t use multi-agent orchestration.</div>
+              <div className="text-accent-blue">Plain folders, numbered stages, markdown prompts.</div>
+              <div className="text-accent-blue">One agent reads the right file at the right moment.</div>
+              <div className="text-accent-blue">That&apos;s the whole system.</div>
+              <div className="text-text-slate/60">
+                <a
+                  href="https://arxiv.org/html/2603.16021v2"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hover:text-accent-blue transition-colors"
                 >
-                  Interpretable Context Methodology (ICM)
+                  // interpretable context methodology
                 </a>
-              </span>
-              <p className="text-[10px] leading-relaxed">
-                Multi-agent frameworks introduce unnecessary engineering overhead for sequential, human-in-the-loop workflows. Interpretable Context Methodology (ICM) replaces code-orchestrated complexity with simple filesystem structure, using numbered folders for workflow stages and plain markdown files for prompts. This allows a single agent, reading files at the right moments, to execute workflows that would otherwise require full multi-agent orchestration.
-              </p>
+              </div>
             </div>
             
             {/* Visual Node Graph Grid */}

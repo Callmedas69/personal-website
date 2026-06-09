@@ -23,7 +23,16 @@ STRICT: do not read the whole codebase. only read the part of codebase that is r
   - `BrandDashboard.tsx`: Removed contract/status/minted/price labels from 02_ONCHAIN; RPC console logs now auto-scroll; 01_AI-NATIVE tab displays ICM paper abstract (3-sentence summary) + node graph of 3 core principles (CLAUDE.md, CONTEXT.md, Folder Structure); title hyperlinked to arXiv.
   - `AgentTerminal.tsx`: Fixed `/clear` command (was not matching slash-prefixed form); added `/archives` command listing ON HOLD (InvisibleLaw, Judith, The Arc) and ARCHIVED (BaseCred, Lore, Phi, Geoplet) projects; added `[ /archives ]` quick suggestion button; removed `/generate` command and its button.
 
+### Session 2026-06-09 Changes
+- **AgentTerminal refactor**: Decomposed into `src/components/terminal/types.ts`, `commands.ts`, `MoodBadge.tsx`. `AgentTerminal.tsx` is now a clean UI shell (~334 lines).
+- **0xNull persona**: Prompt prefix `0xNull@0xdas`, welcome copy updated with `// you're talking to 0xNull.`, identity bar updated.
+- **Mood state system**: `MoodState` = thinking (white) / shipping (green) / broke (red) / flow (cyan). `● mood` badge renders above each response (streaming + committed).
+- **Command responses**: All 6 responses rewritten in 0xNull voice (dry, builder-brained). Housed in `commands.ts` — no inline strings in UI layer.
+- **/feed → /cognitive-log**: Directory renamed, `Header.tsx` href/active check/label updated, page h1 and error strings updated, component renamed `CognitiveLog`.
+
 ### Next Session TODOs
-- [x] **Review `/archives` and `/projects` project descriptions** — verify accuracy of InvisibleLaw, Judith, The Arc, BaseCred, Lore, Phi, Geoplet entries in `AgentTerminal.tsx` and move Invisible Law to hold/archives. (Completed on 2026-05-31)
-- [x] **Mobile layout refactor** — audit and fix responsive layout across `page.tsx`, `BrandDashboard.tsx`, `AgentTerminal.tsx`, and `InvisibleLawVisualizer.tsx` for small-screen breakpoints. (Completed on 2026-05-31)
+- [x] **Review `/archives` and `/projects` project descriptions** (Completed 2026-05-31)
+- [x] **Mobile layout refactor** (Completed 2026-05-31)
+- [x] **0xNull terminal persona + mood states** (Completed 2026-06-09)
+- [ ] **Test terminal UI visually** — run dev server, verify mood badge colors, streaming behavior, and cognitive-log route in browser.
 

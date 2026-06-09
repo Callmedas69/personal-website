@@ -81,6 +81,56 @@ body {
   background: rgba(110, 156, 241, 0.5);
 }
 
+/* Reduced motion: disable decorative animations */
+@media (prefers-reduced-motion: reduce) {
+  .animate-cursor {
+    animation: none;
+    opacity: 1;
+  }
+  .animate-pulse {
+    animation: none;
+    opacity: 1;
+  }
+}
+
+/* 0xNull theme tokens — full palette per context mode (FOUC fallback; GSAP handles transitions) */
+[data-theme="thinking"] {
+  --color-brand-bg:      #011627;
+  --color-terminal-bg:   #011627;
+  --color-terminal-inner:#070d19;
+  --color-text-primary:  #d8dee9;
+  --color-text-slate:    #5f7d97;
+  --color-accent-blue:   #6e9cf1;
+  --color-border-line:   rgba(192,199,209,0.12);
+}
+[data-theme="shipping"] {
+  --color-brand-bg:      #011a08;
+  --color-terminal-bg:   #011a08;
+  --color-terminal-inner:#030f05;
+  --color-text-primary:  #d4ead8;
+  --color-text-slate:    #4a7a58;
+  --color-accent-blue:   #aae87b;
+  --color-border-line:   rgba(170,232,123,0.12);
+}
+[data-theme="broke"] {
+  --color-brand-bg:      #1a0608;
+  --color-terminal-bg:   #1a0608;
+  --color-terminal-inner:#110405;
+  --color-text-primary:  #ead8d9;
+  --color-text-slate:    #7a4a50;
+  --color-accent-blue:   #f87171;
+  --color-border-line:   rgba(248,113,113,0.12);
+}
+[data-theme="flow"] {
+  --color-brand-bg:      #010f1a;
+  --color-terminal-bg:   #010f1a;
+  --color-terminal-inner:#050c15;
+  --color-text-primary:  #d8eaed;
+  --color-text-slate:    #3d7080;
+  --color-accent-blue:   #60d0ff;
+  --color-border-line:   rgba(96,208,255,0.12);
+}
+
 /* Custom terminal scanning lines effect */
 .scanlines {
   position: relative;

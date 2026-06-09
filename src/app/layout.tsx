@@ -1,12 +1,6 @@
 import type { Metadata } from "next";
-import { JetBrains_Mono } from "next/font/google";
 import { Providers } from "./providers";
 import "./globals.css";
-
-const jetbrainsMono = JetBrains_Mono({
-  variable: "--font-jetbrains-mono",
-  subsets: ["latin"],
-});
 
 export const metadata: Metadata = {
   title: "0xdas.dev · talk-to-my-agent",
@@ -22,8 +16,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${jetbrainsMono.variable} h-full antialiased`}>
+    <html lang="en" className="h-full antialiased">
       <body className="min-h-full flex flex-col bg-brand-bg text-text-primary">
+        <script dangerouslySetInnerHTML={{__html:`try{var t=localStorage.getItem('0xnull-theme');if(t)document.documentElement.dataset.theme=t;}catch(e){}`}} />
         <Providers>{children}</Providers>
       </body>
     </html>

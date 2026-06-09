@@ -1,8 +1,6 @@
 import AgentTerminal from "@/components/AgentTerminal";
 import BrandDashboard from "@/components/BrandDashboard";
 import Header from "@/components/Header";
-import OxNull from "@/components/OxNull";
-import OxNullPanel from "@/components/OxNullPanel";
 
 export default function Home() {
   return (
@@ -19,7 +17,7 @@ export default function Home() {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
 
           {/* LEFT COLUMN */}
-          <div className="lg:col-span-6 flex flex-col space-y-6">
+          <div className="lg:col-span-6 flex flex-col space-y-6 order-last lg:order-first">
 
             {/* Hero */}
             <div className="relative space-y-3">
@@ -27,7 +25,7 @@ export default function Home() {
                 [ 0x_Cognitive_Context ]
               </div>
 
-              <h1 className="font-sans text-2xl md:text-3xl font-extrabold tracking-tight text-white leading-tight">
+              <h1 className="font-sans text-[clamp(2rem,4vw,3.25rem)] font-extrabold tracking-tight text-white leading-tight text-balance">
                 the ideas are loud<br />
                 <span className="text-accent-blue">the button is hard</span>
               </h1>
@@ -36,13 +34,10 @@ export default function Home() {
                 anyone can show a deploy. nobody shows the moment before they almost quit.
               </p>
 
-              <p className="font-mono text-[10px] text-text-slate/50 tracking-widest">
+              <p className="font-mono text-[10px] text-text-slate tracking-widest">
                 cognitive. solo. shipping.
               </p>
             </div>
-
-            {/* 0xNull mood panel */}
-            <OxNullPanel />
 
             {/* Brand Dashboard */}
             <BrandDashboard />
@@ -50,15 +45,22 @@ export default function Home() {
           </div>
 
           {/* RIGHT COLUMN — Agent Terminal */}
-          <div className="lg:col-span-6 h-full min-h-[620px]">
+          <div className="lg:col-span-6 h-full min-h-[620px] order-first lg:order-last">
             <AgentTerminal />
           </div>
 
         </div>
       </main>
 
-      <footer className="relative z-10 py-6 text-center select-none border-t border-border-line/20 mt-auto">
-        <p className="font-mono text-[9px] text-text-slate/60">
+      <footer className="relative z-10 py-6 text-center select-none border-t border-border-line/20 mt-auto space-y-2">
+        <div className="flex items-center justify-center space-x-4 font-mono text-[10px] text-text-slate">
+          <a href="https://farcaster.xyz/0xd" target="_blank" rel="noopener noreferrer" className="hover:text-accent-mint transition-colors">farcaster</a>
+          <span aria-hidden="true" className="text-text-slate">·</span>
+          <a href="https://x.com/0xdasx" target="_blank" rel="noopener noreferrer" className="hover:text-accent-blue transition-colors">twitter</a>
+          <span aria-hidden="true" className="text-text-slate">·</span>
+          <a href="https://github.com/Callmedas69" target="_blank" rel="noopener noreferrer" className="hover:text-accent-purple transition-colors">github</a>
+        </div>
+        <p className="font-mono text-[9px] text-text-slate">
           // the thinking is free - 0xDas▋
         </p>
       </footer>

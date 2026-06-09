@@ -158,7 +158,7 @@ export default function CognitiveLog() {
         {/* Header row */}
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-8 pb-4 border-b border-border-line/20">
           <div className="flex items-baseline space-x-3">
-            <h1 className="font-sans text-4xl font-extrabold tracking-tight text-white">cognitive-log</h1>
+            <h1 className="font-sans text-[clamp(2rem,4vw,3.25rem)] font-extrabold tracking-tight text-white text-balance">cognitive-log</h1>
             <span className="font-mono text-accent-yellow text-sm font-bold">
               ({filteredItems.length})
             </span>
@@ -300,12 +300,21 @@ export default function CognitiveLog() {
                     </div>
                   ))
                 ) : error ? (
-                  <div className="p-8 text-center font-mono text-xs text-red-400">
-                    Error loading cognitive-log: {error}
+                  <div className="p-8 text-center font-mono text-xs text-red-400/80 space-y-1">
+                    <div>// failed to load entries.</div>
+                    <div className="text-text-slate/50">check connection and retry.</div>
                   </div>
                 ) : filteredItems.length === 0 ? (
-                  <div className="p-8 text-center font-mono text-xs text-text-slate">
-                    No matching items found in the cognitive-log.
+                  <div className="p-8 text-center font-mono text-xs text-text-slate space-y-2">
+                    <div>// no matching entries.</div>
+                    {(selectedTypes.length > 0 || selectedTopics.length > 0 || searchQuery) && (
+                      <button
+                        onClick={clearFilters}
+                        className="text-accent-blue hover:text-accent-mint transition-colors cursor-pointer"
+                      >
+                        clear filters
+                      </button>
+                    )}
                   </div>
                 ) : (
                   filteredItems.map(item => (
@@ -354,7 +363,7 @@ export default function CognitiveLog() {
 
                       {/* Expanded Content Panel */}
                       {expandedRow === item.id && (
-                        <div className="px-5 pb-5 pt-1 border-l-2 border-l-accent-mint bg-terminal-inner/40 font-mono text-xs text-text-slate space-y-3 animate-fadeIn">
+                        <div className="px-5 pb-5 pt-1 border-x border-b border-accent-mint/20 bg-accent-mint/5 rounded-b-lg font-mono text-xs text-text-slate space-y-3">
                           {item.subtitle && (
                             <p className="text-white font-medium">{item.subtitle}</p>
                           )}
