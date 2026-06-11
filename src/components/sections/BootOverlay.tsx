@@ -10,8 +10,9 @@ const BOOT_LINES = [
   { text: "[ok] mounting /cognition", color: "text-text-slate" },
   { text: "[ok] connecting BASE_MAINNET", color: "text-accent-mint" },
   { text: "[ok] loading persona: 0xNull", color: "text-accent-blue" },
-  { text: "[..] attaching session", color: "text-text-slate" },
 ];
+
+const SPINNER_FRAMES = ["/", "-", "\\", "|"];
 
 /**
  * First-visit boot sequence. The inline script in layout.tsx sets
@@ -23,6 +24,7 @@ export default function BootOverlay() {
   const [active, setActive] = useState<boolean | null>(null);
   const overlayRef = useRef<HTMLDivElement>(null);
   const tlRef = useRef<gsap.core.Timeline | null>(null);
+  const spinnerRef = useRef<HTMLSpanElement>(null);
   const lenis = useLenis();
 
   useEffect(() => {
@@ -35,7 +37,25 @@ export default function BootOverlay() {
 
       lenis?.stop();
 
+      // session-attach spinner; runs until the hold ends or the user skips
+      let frame = 0;
+      const spin = window.setInterval(() => {
+        frame = (frame + 1) % SPINNER_FRAMES.length;
+        if (spinnerRef.current) spinnerRef.current.textContent = SPINNER_FRAMES[frame];
+      }, 100);
+      const stopSpinner = () => {
+        window.clearInterval(spin);
+        if (spinnerRef.current) {
+          spinnerRef.current.textContent = "ok";
+          spinnerRef.current.parentElement?.classList.replace(
+            "text-text-slate",
+            "text-accent-mint"
+          );
+        }
+      };
+
       const finish = () => {
+        stopSpinner();
         try {
           sessionStorage.setItem("0xnull-booted", "1");
         } catch {}
@@ -55,7 +75,10 @@ export default function BootOverlay() {
         stagger: 0.28,
       });
       tl.to("[data-boot-progress]", { scaleX: 1, duration: 1.3, ease: "none" }, 0.1);
-      tl.to("[data-boot-line]", { autoAlpha: 0, duration: 0.2, stagger: 0.03 }, "+=0.25");
+      // hold while the spinner runs, then flip [/] → [ok] and pause a beat
+      tl.to({}, { duration: 1.2 });
+      tl.call(stopSpinner);
+      tl.to("[data-boot-line]", { autoAlpha: 0, duration: 0.2, stagger: 0.03 }, "+=0.4");
       tl.to("[data-boot-mascot], [data-boot-progress]", { autoAlpha: 0, duration: 0.2 }, "<");
       // hero entrance fires as the wipe begins, so the two motions overlap
       tl.call(() => document.dispatchEvent(new CustomEvent("boot-complete")));
@@ -66,6 +89,7 @@ export default function BootOverlay() {
       window.addEventListener("keydown", skip);
       window.addEventListener("pointerdown", skip);
       return () => {
+        window.clearInterval(spin);
         window.removeEventListener("keydown", skip);
         window.removeEventListener("pointerdown", skip);
       };
@@ -93,6 +117,9 @@ export default function BootOverlay() {
               {line.text}
             </div>
           ))}
+          <div data-boot-line className="boot-line text-text-slate">
+            [<span ref={spinnerRef}>/</span>] attaching session
+          </div>
         </div>
         <div className="w-48 h-px bg-border-line overflow-hidden">
           <div data-boot-progress className="boot-progress h-px bg-accent-blue origin-left" />
