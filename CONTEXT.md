@@ -30,9 +30,24 @@ STRICT: do not read the whole codebase. only read the part of codebase that is r
 - **Command responses**: All 6 responses rewritten in 0xNull voice (dry, builder-brained). Housed in `commands.ts` — no inline strings in UI layer.
 - **/feed → /cognitive-log**: Directory renamed, `Header.tsx` href/active check/label updated, page h1 and error strings updated, component renamed `CognitiveLog`.
 
+### Session 2026-06-11 Changes — Awwwards Scroll Narrative Redesign
+- **Homepage rebuilt as scroll narrative** (plan: `docs/2026-06-11_awwwards-scroll-narrative_plan.md`): boot → hero → pinned terminal demo → cognitive-log strip → onchain proof → void-energy footer.
+- **New**: `lenis` smooth scroll (`SmoothScroll.tsx`, GSAP-ticker driven), `src/lib/motion.ts` (shared EASE/DUR/STAGGER/MM), `src/lib/paragraph.ts` (server-side posts fetch), `src/components/sections/*` (BootOverlay, HeroSection, TerminalSection, LogStrip, OnchainSection + onchain/*, SiteFooter), `terminal/engine.ts` + `script.ts` (seekable scripted-session engine).
+- **AgentTerminal**: new `mode="scripted"` + `scriptProgress` props — ScrollTrigger scrubs a deterministic 3-command demo (/stack /projects /status), hands over to interactive at pin end. `autoFocus` removed (was scroll-hijacking page load).
+- **Boot sequence**: first-visit kernel-style boot overlay (~2.4s), sessionStorage `0xnull-booted` skip, reduced-motion skip, click/keypress skip, no-JS safe (CSS-gated via `[data-boot="pending"]`).
+- **Retired**: `BrandDashboard.tsx` (01_CONTEXT → terminal marginalia; 02_ONCHAIN → OnchainSection), `InvisibleLawVisualizer.tsx` (dead code). `WobbleVisualizer.tsx` kept unused (possible footer easter egg).
+- **Header**: fixed position, solid tone after 24px scroll.
+- **Cognitive-log page**: h1 mask entrance, one-time row stagger, CSS grid-rows expand animation, pt-28 for fixed header.
+- **DESIGN.md amended**: display role promoted to clamp(2.75rem–6rem), tracking -0.04em.
+- **Known gotcha**: scrubbed tweens must use `fromTo` + `immediateRender:false` when targets can be boot-hidden at creation (start values cache otherwise). Boot-listener targets must be element refs, not selector strings (dev remounts leave stale once-listeners).
+- **Verified**: prod build clean, boot/skip/repeat-visit paths, reduced-motion (no overlay, content visible), mobile (no pin, interactive terminal), zero console errors.
+
 ### Next Session TODOs
 - [x] **Review `/archives` and `/projects` project descriptions** (Completed 2026-05-31)
 - [x] **Mobile layout refactor** (Completed 2026-05-31)
 - [x] **0xNull terminal persona + mood states** (Completed 2026-06-09)
-- [ ] **Test terminal UI visually** — run dev server, verify mood badge colors, streaming behavior, and cognitive-log route in browser.
+- [x] **Test terminal UI visually** (Completed 2026-06-11 — covered by redesign verification)
+- [ ] **Perf profile**: 4x CPU-throttle scrub through terminal pin + Lighthouse mobile run.
+- [ ] **Self-host Sohne fonts** via next/font/local (currently hotlinked from stripe.dev with preload + swap).
+- [ ] **Decide**: WobbleVisualizer as footer easter egg or delete.
 

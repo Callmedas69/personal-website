@@ -5,6 +5,7 @@
   src: url('https://stripe.dev/fonts/Sohne.woff2') format('woff2');
   font-weight: 300 700;
   font-style: normal;
+  font-display: swap;
 }
 
 @font-face {
@@ -12,6 +13,7 @@
   src: url('https://stripe.dev/fonts/SohneMono-Buch.woff2') format('woff2');
   font-weight: 300 700;
   font-style: normal;
+  font-display: swap;
 }
 
 :root {
@@ -45,6 +47,29 @@ body {
   color: var(--color-text-primary);
   font-family: var(--font-sans);
   overflow-x: hidden;
+}
+
+/* Boot sequence gate — inline script sets [data-boot="pending"] before paint
+   on first visit (skipped on repeat visits and under reduced motion).
+   The cover hides the page until BootOverlay hydrates and takes over.
+   No JS → no attribute → page renders plain. */
+[data-boot="pending"] body {
+  overflow: hidden;
+}
+.boot-cover {
+  opacity: 0;
+  visibility: hidden;
+}
+[data-boot="pending"] .boot-cover {
+  opacity: 1;
+  visibility: visible;
+}
+/* Pre-hydration initial states so nothing flashes before the timeline runs */
+[data-boot="pending"] .boot-line {
+  clip-path: inset(0 100% 0 0);
+}
+[data-boot="pending"] .boot-progress {
+  transform: scaleX(0);
 }
 
 /* Custom Utilities for Terminal Vibe */

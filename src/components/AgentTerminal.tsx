@@ -1,16 +1,26 @@
 "use client";
 
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useMemo } from "react";
 import { AlertTriangle, Command, Send } from "lucide-react";
-import { gsap } from "gsap";
+import { gsap } from "@/lib/motion";
 import { useGSAP } from "@gsap/react";
 import MoodBadge from "./terminal/MoodBadge";
 import OxNull from "./OxNull";
 import { resolveCommand } from "./terminal/commands";
+import { sliceAt } from "./terminal/engine";
+import { DEMO_SCRIPT } from "./terminal/script";
 import { MOOD_CONFIG } from "./terminal/types";
 import type { LogEntry, MoodState } from "./terminal/types";
 
 gsap.registerPlugin(useGSAP);
+
+export interface AgentTerminalProps {
+  /** "scripted": render a deterministic slice of the demo session driven by scriptProgress (0..1). */
+  mode?: "interactive" | "scripted";
+  scriptProgress?: number;
+  /** called when the user clicks the terminal during the scripted demo */
+  onRequestSkip?: () => void;
+}
 
 const THEMES: Record<MoodState, Record<string, string>> = {
   thinking: {
@@ -58,7 +68,12 @@ const THEME_DOTS: { id: MoodState; color: string }[] = [
   { id: "flow",     color: "#60d0ff" },
 ];
 
-export default function AgentTerminal() {
+export default function AgentTerminal({
+  mode = "interactive",
+  scriptProgress = 0,
+  onRequestSkip,
+}: AgentTerminalProps = {}) {
+  const scripted = mode === "scripted";
   const [inputVal, setInputVal] = useState("");
   const [logs, setLogs] = useState<LogEntry[]>([]);
   const [isTyping, setIsTyping] = useState(false);
@@ -105,7 +120,18 @@ export default function AgentTerminal() {
     }
   };
 
-  // Terminal entrance animation
+  // Scripted demo: rendering is a pure function of scroll progress
+  const slice = useMemo(
+    () => (scripted ? sliceAt(DEMO_SCRIPT, scriptProgress) : null),
+    [scripted, scriptProgress]
+  );
+  const displayLogs = slice ? slice.logs : logs;
+  const scriptTyping = slice?.typingCommand ?? null;
+  const scriptStreaming = slice?.streaming ?? null;
+  const busy = scripted ? scriptTyping !== null || scriptStreaming !== null : isTyping;
+  const mascotMood = scripted ? slice!.mood : currentMood;
+
+  // Terminal entrance animation — fires when the terminal scrolls into view
   useGSAP(() => {
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     gsap.from(terminalRef.current, {
@@ -113,6 +139,11 @@ export default function AgentTerminal() {
       y: 30,
       duration: 0.6,
       ease: "power3.out",
+      scrollTrigger: {
+        trigger: terminalRef.current,
+        start: "top 90%",
+        toggleActions: "play none none none",
+      },
     });
   }, { scope: terminalRef });
 
@@ -120,7 +151,7 @@ export default function AgentTerminal() {
   useGSAP(() => {
     if (!mascotRef.current) return;
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    if (isTyping) {
+    if (busy) {
       gsap.to(mascotRef.current, {
         y: -4,
         yoyo: true,
@@ -132,15 +163,19 @@ export default function AgentTerminal() {
       gsap.killTweensOf(mascotRef.current);
       gsap.to(mascotRef.current, { y: 0, duration: 0.15, ease: "power2.out" });
     }
-  }, { scope: terminalRef, dependencies: [isTyping] });
+  }, { scope: terminalRef, dependencies: [busy] });
 
   useEffect(() => {
     if (logsContainerRef.current) {
       logsContainerRef.current.scrollTop = logsContainerRef.current.scrollHeight;
     }
-  }, [logs, currentResponseStream]);
+  }, [logs, currentResponseStream, scriptProgress]);
 
   const handleConsoleClick = () => {
+    if (scripted) {
+      onRequestSkip?.();
+      return;
+    }
     if (inputRef.current) inputRef.current.focus();
   };
 
@@ -268,10 +303,10 @@ export default function AgentTerminal() {
       <div className="flex items-center justify-between px-4 py-2.5 bg-terminal-inner border-b border-border-line select-none">
         <div className="flex items-center gap-3">
           <div ref={mascotRef}>
-            <OxNull mood={currentMood} size={40} />
+            <OxNull mood={mascotMood} size={40} />
           </div>
-          <span className={`font-mono text-[10px] ${isTyping ? MOOD_CONFIG[currentMood].colorClass : MOOD_CONFIG[themeMood].colorClass}`}>
-            {isTyping ? "// responding..." : `// ${MOOD_CONFIG[themeMood].label}`}
+          <span className={`font-mono text-[10px] ${busy ? MOOD_CONFIG[mascotMood].colorClass : MOOD_CONFIG[themeMood].colorClass}`}>
+            {busy ? "// responding..." : scripted ? "// demo session" : `// ${MOOD_CONFIG[themeMood].label}`}
           </span>
         </div>
         <div className="flex items-center gap-1.5">
@@ -312,7 +347,7 @@ export default function AgentTerminal() {
         </div>
 
         <div className="space-y-4 pt-2">
-          {logs.map((log, idx) => (
+          {displayLogs.map((log, idx) => (
             <div key={idx} className="space-y-1.5">
               {log.command && (
                 <div className="flex items-start space-x-2">
@@ -339,7 +374,43 @@ export default function AgentTerminal() {
             </div>
           ))}
 
-          {isTyping && (
+          {/* Scripted demo: command being typed at the prompt */}
+          {scriptTyping !== null && (
+            <div className="flex items-start space-x-2">
+              <span className="text-accent-green font-bold">0xNull@0xdas</span>
+              <span className="text-text-slate">~</span>
+              <span className="text-accent-blue font-bold">%</span>
+              <span className="text-text-primary font-semibold">
+                {scriptTyping}
+                <span className="inline-block w-2.5 h-4 bg-accent-blue animate-cursor ml-0.5 align-middle" />
+              </span>
+            </div>
+          )}
+
+          {/* Scripted demo: response streaming out */}
+          {scriptStreaming && (
+            <div className="space-y-1.5">
+              <div className="flex items-start space-x-2">
+                <span className="text-accent-green font-bold">0xNull@0xdas</span>
+                <span className="text-text-slate">~</span>
+                <span className="text-accent-blue font-bold">%</span>
+                <span className="text-text-primary font-semibold">{scriptStreaming.command}</span>
+              </div>
+              <div className="pl-4 border-l border-border-line/45">
+                <div className="mb-1">
+                  <MoodBadge mood={scriptStreaming.mood} />
+                </div>
+                {scriptStreaming.isHTML ? (
+                  <div dangerouslySetInnerHTML={{ __html: scriptStreaming.partial }} />
+                ) : (
+                  <div className="whitespace-pre-wrap text-text-slate leading-relaxed">{scriptStreaming.partial}</div>
+                )}
+                <span className="inline-block w-2.5 h-4 bg-accent-mint animate-cursor ml-1" />
+              </div>
+            </div>
+          )}
+
+          {!scripted && isTyping && (
             <div className="space-y-1.5">
               <div className="pl-4 border-l border-border-line/45">
                 <div className="mb-1">
@@ -365,28 +436,28 @@ export default function AgentTerminal() {
         </span>
         <button
           onClick={() => handleSuggestionClick("/stack")}
-          disabled={isTyping}
+          disabled={isTyping || scripted}
           className="px-2 py-0.5 rounded text-xs font-mono border border-border-line text-accent-blue bg-terminal-inner/40 hover:bg-accent-blue/10 hover:border-accent-blue/40 transition-colors disabled:opacity-40"
         >
           [ /stack ]
         </button>
         <button
           onClick={() => handleSuggestionClick("/projects")}
-          disabled={isTyping}
+          disabled={isTyping || scripted}
           className="px-2 py-0.5 rounded text-xs font-mono border border-border-line text-accent-yellow bg-terminal-inner/40 hover:bg-accent-yellow/10 hover:border-accent-yellow/40 transition-colors disabled:opacity-40"
         >
           [ /projects ]
         </button>
         <button
           onClick={() => handleSuggestionClick("/archives")}
-          disabled={isTyping}
+          disabled={isTyping || scripted}
           className="px-2 py-0.5 rounded text-xs font-mono border border-border-line text-accent-purple bg-terminal-inner/40 hover:bg-accent-purple/10 hover:border-accent-purple/40 transition-colors disabled:opacity-40"
         >
           [ /archives ]
         </button>
         <button
           onClick={() => handleSuggestionClick("/help")}
-          disabled={isTyping}
+          disabled={isTyping || scripted}
           className="px-2 py-0.5 rounded text-xs font-mono border border-border-line text-accent-purple bg-terminal-inner/40 hover:bg-accent-purple/10 hover:border-accent-purple/40 transition-colors disabled:opacity-40"
         >
           [ /help ]
@@ -410,9 +481,16 @@ export default function AgentTerminal() {
           onChange={(e) => setInputVal(e.target.value.slice(0, 200))}
           onKeyDown={handleKeyDown}
           disabled={isTyping}
-          placeholder={isTyping ? "agent is responding..." : "ask 0xNull a question..."}
+          readOnly={scripted}
+          tabIndex={scripted ? -1 : 0}
+          placeholder={
+            scripted
+              ? "// demo session — scroll, or click to skip"
+              : isTyping
+              ? "agent is responding..."
+              : "ask 0xNull a question..."
+          }
           className="flex-1 bg-transparent border-none outline-none font-mono text-sm ml-2.5 text-text-primary placeholder-text-slate/60 disabled:cursor-not-allowed"
-          autoFocus
         />
         <div className="flex items-center space-x-3 text-xs font-mono text-text-slate">
           <span className="hidden sm:inline-block text-[10px] text-text-slate/65 border border-border-line px-1 rounded bg-terminal-bg/50">

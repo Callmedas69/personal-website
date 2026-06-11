@@ -1,8 +1,9 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
-import Link from "next/link";
+import React, { useState, useEffect, useRef } from "react";
 import { ChevronDown, Plus, Minus, Search, ExternalLink } from "lucide-react";
+import { useGSAP } from "@gsap/react";
+import { gsap, EASE, DUR, STAGGER, MM } from "@/lib/motion";
 import Header from "@/components/Header";
 
 interface FeedItem {
@@ -17,6 +18,7 @@ interface FeedItem {
 }
 
 export default function CognitiveLog() {
+  const mainRef = useRef<HTMLElement>(null);
   const [feedItems, setFeedItems] = useState<FeedItem[]>([]);
   const [filteredItems, setFilteredItems] = useState<FeedItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -147,25 +149,61 @@ export default function CognitiveLog() {
     setExpandedRow(prev => (prev === id ? null : id));
   };
 
+  // Page entrance: h1 line-mask reveal, count + search follow
+  useGSAP(
+    () => {
+      const mm = gsap.matchMedia();
+      mm.add(MM, (ctx) => {
+        const { ok } = ctx.conditions as { ok: boolean };
+        if (!ok) return;
+        const tl = gsap.timeline({ defaults: { ease: EASE.out } });
+        tl.from("[data-log-title]", { yPercent: 110, duration: DUR.base });
+        tl.from("[data-log-meta]", { autoAlpha: 0, y: 8, duration: DUR.base, stagger: 0.08 }, 0.2);
+      });
+    },
+    { scope: mainRef }
+  );
+
+  // Row stagger — only when loading finishes, never on filter/search changes
+  useGSAP(
+    () => {
+      if (isLoading) return;
+      if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+      const rows = gsap.utils.toArray<HTMLElement>("[data-feed-row]").slice(0, 15);
+      if (rows.length === 0) return;
+      gsap.from(rows, {
+        y: 12,
+        autoAlpha: 0,
+        duration: 0.5,
+        ease: EASE.outSoft,
+        stagger: STAGGER.rows,
+        clearProps: "all",
+      });
+    },
+    { scope: mainRef, dependencies: [isLoading] }
+  );
+
   return (
     <div className="flex flex-col min-h-screen bg-brand-bg text-text-primary selection:bg-accent-blue/30 selection:text-white relative">
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-terminal-bg/30 via-brand-bg/95 to-brand-bg pointer-events-none z-0"></div>
       
       <Header />
 
-      <main className="relative z-10 flex-1 w-full max-w-6xl mx-auto px-6 py-10">
-        
+      <main ref={mainRef} className="relative z-10 flex-1 w-full max-w-6xl mx-auto px-6 pt-28 pb-10">
+
         {/* Header row */}
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-8 pb-4 border-b border-border-line/20">
           <div className="flex items-baseline space-x-3">
-            <h1 className="font-sans text-[clamp(2rem,4vw,3.25rem)] font-extrabold tracking-tight text-white text-balance">cognitive-log</h1>
-            <span className="font-mono text-accent-yellow text-sm font-bold">
+            <div className="overflow-hidden">
+              <h1 data-log-title className="font-sans text-[clamp(2rem,4vw,3.25rem)] font-extrabold tracking-tight text-white text-balance">cognitive-log</h1>
+            </div>
+            <span data-log-meta className="font-mono text-accent-yellow text-sm font-bold">
               ({filteredItems.length})
             </span>
           </div>
-          
+
           {/* Search Input */}
-          <div className="relative mt-4 md:mt-0 w-full md:w-64">
+          <div data-log-meta className="relative mt-4 md:mt-0 w-full md:w-64">
             <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-text-slate" />
             <input
               type="text"
@@ -318,7 +356,7 @@ export default function CognitiveLog() {
                   </div>
                 ) : (
                   filteredItems.map(item => (
-                    <div key={item.id} className="flex flex-col transition-colors hover:bg-terminal-inner/20">
+                    <div key={item.id} data-feed-row className="flex flex-col transition-colors hover:bg-terminal-inner/20">
                       
                       {/* Main Row */}
                       <div
@@ -361,8 +399,12 @@ export default function CognitiveLog() {
 
                       </div>
 
-                      {/* Expanded Content Panel */}
-                      {expandedRow === item.id && (
+                      {/* Expanded Content Panel — grid-rows trick animates height in pure CSS */}
+                      <div
+                        className="grid transition-[grid-template-rows] duration-200 ease-out motion-reduce:transition-none"
+                        style={{ gridTemplateRows: expandedRow === item.id ? "1fr" : "0fr" }}
+                      >
+                        <div className="overflow-hidden">
                         <div className="px-5 pb-5 pt-1 border-x border-b border-accent-mint/20 bg-accent-mint/5 rounded-b-lg font-mono text-xs text-text-slate space-y-3">
                           {item.subtitle && (
                             <p className="text-white font-medium">{item.subtitle}</p>
@@ -394,7 +436,8 @@ export default function CognitiveLog() {
                             </a>
                           </div>
                         </div>
-                      )}
+                        </div>
+                      </div>
 
                     </div>
                   ))
