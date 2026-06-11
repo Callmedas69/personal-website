@@ -319,20 +319,22 @@ export default function CognitiveLog() {
             <div className="border border-border-line/60 rounded-lg overflow-hidden bg-terminal-inner/30">
               
               {/* Table Header */}
-              <div className="grid grid-cols-12 px-5 py-3 border-b border-border-line/50 font-mono text-[10px] text-text-slate tracking-wider select-none bg-terminal-inner/50">
-                <div className="col-span-2">/ DATE</div>
-                <div className="col-span-7 sm:col-span-8">/ NAME</div>
-                <div className="col-span-3 sm:col-span-2 text-right">/ TYPE</div>
+              <div className="flex justify-between sm:grid sm:grid-cols-12 px-5 py-3 border-b border-border-line/50 font-mono text-[10px] text-text-slate tracking-wider select-none bg-terminal-inner/50">
+                <div className="sm:col-span-2">/ DATE<span className="sm:hidden"> / NAME</span></div>
+                <div className="hidden sm:block sm:col-span-8">/ NAME</div>
+                <div className="sm:col-span-2 text-right">/ TYPE</div>
               </div>
 
               {/* Table Body */}
               <div className="divide-y divide-border-line/30">
                 {isLoading ? (
                   Array.from({ length: 5 }).map((_, idx) => (
-                    <div key={idx} className="grid grid-cols-12 px-5 py-4 items-center animate-pulse">
-                      <div className="col-span-2 h-4 bg-border-line/20 rounded w-16"></div>
-                      <div className="col-span-7 sm:col-span-8 h-4 bg-border-line/20 rounded w-2/3"></div>
-                      <div className="col-span-3 sm:col-span-2 flex justify-end">
+                    <div key={idx} className="flex justify-between gap-3 sm:grid sm:grid-cols-12 px-5 py-4 items-center animate-pulse">
+                      <div className="flex flex-col gap-2 flex-1 sm:contents">
+                        <div className="sm:col-span-2 h-4 bg-border-line/20 rounded w-16"></div>
+                        <div className="sm:col-span-8 h-4 bg-border-line/20 rounded w-2/3"></div>
+                      </div>
+                      <div className="shrink-0 sm:col-span-2 flex justify-end">
                         <div className="h-4 bg-border-line/20 rounded w-12"></div>
                       </div>
                     </div>
@@ -361,28 +363,31 @@ export default function CognitiveLog() {
                       {/* Main Row */}
                       <div
                         onClick={() => toggleRow(item.id)}
-                        className="grid grid-cols-12 px-5 py-4 items-center cursor-pointer select-none"
+                        className="flex items-center justify-between gap-3 sm:grid sm:grid-cols-12 px-5 py-4 sm:items-center cursor-pointer select-none"
                       >
-                        {/* Date */}
-                        <div className="col-span-2 font-mono text-xs text-accent-blue flex items-center space-x-1.5">
-                          <span className="w-1.5 h-1.5 bg-accent-blue rounded-sm shrink-0"></span>
-                          <span>{item.date}</span>
-                        </div>
-                        
-                        {/* Title */}
-                        <div className="col-span-7 sm:col-span-8 pr-4 flex items-center space-x-2">
-                          <span className="text-sm font-semibold text-white hover:text-accent-mint transition-colors">
-                            {item.title}
-                          </span>
-                          {item.topics.includes("DRAFT") && (
-                            <span className="px-1.5 py-0.5 rounded border border-accent-yellow/30 text-accent-yellow bg-accent-yellow/5 text-[8px] font-mono font-bold tracking-wider scale-90">
-                              DRAFT
+                        {/* Date + Title: stacked on mobile, grid cells from sm: up */}
+                        <div className="flex flex-col gap-1 min-w-0 sm:contents">
+                          {/* Date */}
+                          <div className="sm:col-span-2 font-mono text-xs text-accent-blue flex items-center space-x-1.5">
+                            <span className="w-1.5 h-1.5 bg-accent-blue rounded-sm shrink-0"></span>
+                            <span>{item.date}</span>
+                          </div>
+
+                          {/* Title */}
+                          <div className="sm:col-span-8 sm:pr-4 flex items-center space-x-2">
+                            <span className="text-sm font-semibold text-white hover:text-accent-mint transition-colors">
+                              {item.title}
                             </span>
-                          )}
+                            {item.topics.includes("DRAFT") && (
+                              <span className="px-1.5 py-0.5 rounded border border-accent-yellow/30 text-accent-yellow bg-accent-yellow/5 text-[8px] font-mono font-bold tracking-wider scale-90">
+                                DRAFT
+                              </span>
+                            )}
+                          </div>
                         </div>
-                        
+
                         {/* Type & Accordion Action */}
-                        <div className="col-span-3 sm:col-span-2 flex items-center justify-end space-x-3">
+                        <div className="shrink-0 sm:col-span-2 flex items-center justify-end space-x-3">
                           <span className={`px-2 py-0.5 rounded border text-[9px] font-mono font-bold tracking-wider ${
                             item.type === "BLOG"
                               ? "border-accent-blue/30 text-accent-blue bg-accent-blue/5"

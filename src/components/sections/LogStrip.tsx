@@ -76,7 +76,7 @@ export default function LogStrip({ posts }: { posts: FeedItem[] }) {
         <div
           ref={trackRef}
           data-log-track
-          className="flex gap-4 px-6 pb-20 overflow-x-auto snap-x snap-mandatory lg:[&::-webkit-scrollbar]:hidden"
+          className="flex flex-col md:flex-row gap-4 px-6 pb-20 md:overflow-x-auto md:snap-x md:snap-mandatory lg:[&::-webkit-scrollbar]:hidden"
         >
           {posts.map((post) => (
             <a
@@ -85,7 +85,7 @@ export default function LogStrip({ posts }: { posts: FeedItem[] }) {
               target="_blank"
               rel="noopener noreferrer"
               data-log-card
-              className="snap-start shrink-0 w-[300px] md:w-[340px] border border-border-line rounded-lg bg-terminal-inner/30 p-5 font-mono space-y-3 hover:border-border-line/80 hover:bg-terminal-inner/50 transition-colors group"
+              className="md:snap-start md:shrink-0 w-full md:w-[340px] border border-border-line rounded-lg bg-terminal-inner/30 p-5 font-mono space-y-3 hover:border-border-line/80 hover:bg-terminal-inner/50 transition-colors group"
             >
               <div className="flex items-center justify-between text-[10px]">
                 <span className="text-accent-blue">{post.date}</span>
@@ -115,7 +115,7 @@ export default function LogStrip({ posts }: { posts: FeedItem[] }) {
           <Link
             href="/cognitive-log"
             data-log-card
-            className="snap-start shrink-0 w-[220px] border border-accent-yellow/25 rounded-lg bg-terminal-inner/20 p-5 font-mono flex flex-col justify-between hover:bg-accent-yellow/5 hover:border-accent-yellow/50 transition-colors"
+            className="md:snap-start md:shrink-0 w-full md:w-[220px] border border-accent-yellow/25 rounded-lg bg-terminal-inner/20 p-5 font-mono flex flex-col justify-between gap-3 hover:bg-accent-yellow/5 hover:border-accent-yellow/50 transition-colors"
           >
             <span className="text-[10px] text-text-slate">// full archive</span>
             <span className="text-sm font-bold text-accent-yellow">view full log →</span>
