@@ -49,7 +49,7 @@ export default function SiteFooter() {
   }, []);
 
   return (
-    <footer ref={footerRef} className="relative min-h-[60svh] flex flex-col justify-end w-full max-w-6xl mx-auto px-6 pb-12 select-none">
+    <footer ref={footerRef} data-mascot-section="footer" className="relative min-h-[60svh] flex flex-col justify-end w-full max-w-6xl mx-auto px-6 pb-12 select-none">
       <div className="space-y-6 border-t border-border-line/20 pt-10">
         <div data-footer-line className="flex items-center space-x-4 font-mono text-xs text-text-slate">
           <a href="https://farcaster.xyz/0xd" target="_blank" rel="noopener noreferrer" className="hover:text-accent-mint transition-colors">farcaster</a>

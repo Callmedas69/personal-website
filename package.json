@@ -6,7 +6,8 @@
     "dev": "next dev -p 3001",
     "build": "next build",
     "start": "next start -p 3001",
-    "lint": "eslint"
+    "lint": "eslint",
+    "asset:mascot": "gltf-transform dedup \"D:/Harry/00_THE-VAULT/99_SYSTEM/personal-brand/symbol/0xnull_3d-object.glb\" tmp1.glb && gltf-transform prune tmp1.glb tmp2.glb && gltf-transform quantize tmp2.glb public/models/0xnull.glb --quantize-position 14 && rm tmp1.glb tmp2.glb"
   },
   "dependencies": {
     "@gsap/react": "^2.1.2",
@@ -18,14 +19,17 @@
     "next": "16.2.6",
     "react": "19.2.4",
     "react-dom": "19.2.4",
+    "three": "^0.184.0",
     "viem": "^2.51.0",
     "wagmi": "^2.19.5"
   },
   "devDependencies": {
+    "@gltf-transform/cli": "^4.4.0",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "@types/three": "^0.184.1",
     "eslint": "^9",
     "eslint-config-next": "16.2.6",
     "tailwindcss": "^4",

@@ -5,6 +5,7 @@ import TerminalSection from "@/components/sections/TerminalSection";
 import LogStrip from "@/components/sections/LogStrip";
 import OnchainSection from "@/components/sections/OnchainSection";
 import SiteFooter from "@/components/sections/SiteFooter";
+import Mascot from "@/components/mascot/Mascot";
 import { getRecentPosts } from "@/lib/paragraph";
 
 export default async function Home() {
@@ -16,6 +17,7 @@ export default async function Home() {
       <div className="fixed inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-terminal-bg/30 via-brand-bg/95 to-brand-bg pointer-events-none z-0" />
 
       <BootOverlay />
+      <Mascot />
       <Header />
 
       <main className="relative z-10 flex-1 w-full">

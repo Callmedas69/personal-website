@@ -4,8 +4,6 @@ import { useEffect, useRef, useState } from "react";
 import { useLenis } from "lenis/react";
 import { useGSAP } from "@gsap/react";
 import { gsap, ScrollTrigger, EASE } from "@/lib/motion";
-import OxNull from "@/components/OxNull";
-
 const BOOT_LINES = [
   { text: "[ok] mounting /cognition", color: "text-text-slate" },
   { text: "[ok] connecting BASE_MAINNET", color: "text-accent-mint" },
@@ -75,11 +73,14 @@ export default function BootOverlay() {
         stagger: 0.28,
       });
       tl.to("[data-boot-progress]", { scaleX: 1, duration: 1.3, ease: "none" }, 0.1);
+      // signal 3D mascot to begin voxel assembly (fires at progress bar start)
+      tl.call(() => document.dispatchEvent(new CustomEvent("boot-assembly-start")), [], 0.1);
       // hold while the spinner runs, then flip [/] → [ok] and pause a beat
       tl.to({}, { duration: 1.2 });
       tl.call(stopSpinner);
       tl.to("[data-boot-line]", { autoAlpha: 0, duration: 0.2, stagger: 0.03 }, "+=0.4");
-      tl.to("[data-boot-mascot], [data-boot-progress]", { autoAlpha: 0, duration: 0.2 }, "<");
+      // only fade progress bar — 3D mascot handles its own transition out
+      tl.to("[data-boot-progress]", { autoAlpha: 0, duration: 0.2 }, "<");
       // hero entrance fires as the wipe begins, so the two motions overlap
       tl.call(() => document.dispatchEvent(new CustomEvent("boot-complete")));
       tl.to(overlayRef.current, { yPercent: -100, duration: 0.7, ease: EASE.out }, "-=0.05");
@@ -108,9 +109,8 @@ export default function BootOverlay() {
       aria-hidden="true"
     >
       <div className="flex flex-col items-start gap-5 font-mono select-none">
-        <div data-boot-mascot>
-          <OxNull mood="thinking" size={64} />
-        </div>
+        {/* 3D mascot renders in this slot via MascotStage fixed canvas */}
+        <div data-mascot-slot="boot" className="w-16 h-24" />
         <div className="space-y-1.5 text-xs">
           {BOOT_LINES.map((line) => (
             <div key={line.text} data-boot-line className={`boot-line ${line.color}`}>

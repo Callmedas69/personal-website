@@ -21,6 +21,7 @@ export default function RootLayout({
       <head>
         <link rel="preload" href="https://stripe.dev/fonts/Sohne.woff2" as="font" type="font/woff2" crossOrigin="anonymous" />
         <link rel="preload" href="https://stripe.dev/fonts/SohneMono-Buch.woff2" as="font" type="font/woff2" crossOrigin="anonymous" />
+        <link rel="preload" href="/models/0xnull.glb" as="fetch" crossOrigin="anonymous" />
       </head>
       <body className="min-h-full flex flex-col bg-brand-bg text-text-primary">
         <script dangerouslySetInnerHTML={{__html:`try{var t=localStorage.getItem('0xnull-theme');if(t)document.documentElement.dataset.theme=t;}catch(e){}`}} />

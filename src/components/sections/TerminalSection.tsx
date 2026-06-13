@@ -131,7 +131,7 @@ export default function TerminalSection() {
   const activeThird = Math.min(2, Math.floor(progress * 3));
 
   return (
-    <section ref={wrapRef} id="terminal" className="relative">
+    <section ref={wrapRef} id="terminal" data-mascot-section="terminal" className="relative">
       <div ref={pinRef} className="min-h-svh flex items-center w-full max-w-6xl mx-auto px-6 py-20">
         <div className="flex w-full gap-10 items-center">
           <aside className="hidden lg:flex w-[34%] flex-col gap-6 font-mono select-none">

@@ -160,7 +160,7 @@ export default function OnchainSection() {
   const logsToRender = isConnected ? activeTxLog : simLog;
 
   return (
-    <section ref={sectionRef} className="relative w-full max-w-6xl mx-auto px-6 py-20">
+    <section ref={sectionRef} data-mascot-section="onchain" className="relative w-full max-w-6xl mx-auto px-6 py-20">
       <div className="font-mono text-sm font-bold text-accent-mint mb-6 select-none">// onchain</div>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">

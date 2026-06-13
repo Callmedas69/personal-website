@@ -93,8 +93,15 @@ export default function HeroSection() {
   return (
     <section
       ref={sectionRef}
+      data-mascot-section="hero"
       className="relative min-h-[92svh] flex flex-col justify-center w-full max-w-6xl mx-auto px-6 pt-28 pb-16"
     >
+      {/* 3D mascot anchor — MascotStage aligns the fixed WebGL canvas to this rect */}
+      <div
+        data-mascot-slot="hero"
+        className="absolute right-6 top-1/2 -translate-y-1/2 w-[30%] aspect-[3/4] pointer-events-none hidden md:block"
+        aria-hidden="true"
+      />
       <div className="space-y-5">
         <div className="overflow-hidden">
           <div data-hero-eyebrow className="font-mono text-xs font-bold text-accent-blue uppercase tracking-widest">

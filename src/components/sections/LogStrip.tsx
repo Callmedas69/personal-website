@@ -57,7 +57,7 @@ export default function LogStrip({ posts }: { posts: FeedItem[] }) {
   );
 
   return (
-    <section ref={sectionRef} className="relative overflow-hidden">
+    <section ref={sectionRef} data-mascot-section="log" className="relative overflow-hidden">
       <div className="w-full max-w-6xl mx-auto px-6 pt-20 pb-4 font-mono select-none">
         <span className="text-accent-yellow text-sm font-bold">// cognitive-log</span>
         {posts.length > 0 && (
