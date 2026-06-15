@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start -p 3001",
     "lint": "eslint",
-    "asset:mascot": "gltf-transform dedup \"D:/Harry/00_THE-VAULT/99_SYSTEM/personal-brand/symbol/0xnull_3d-object.glb\" tmp1.glb && gltf-transform prune tmp1.glb tmp2.glb && gltf-transform quantize tmp2.glb public/models/0xnull.glb --quantize-position 14 && rm tmp1.glb tmp2.glb"
+    "asset:mascot": "gltf-transform dedup \"D:/Harry/00_THE-VAULT/99_SYSTEM/personal-brand/symbol/0xnull_3d-object.glb\" tmp1.glb && gltf-transform prune tmp1.glb public/models/0xnull.glb && node -e \"const fs=require('fs');fs.rmSync('tmp1.glb',{force:true})\""
   },
   "dependencies": {
     "@gsap/react": "^2.1.2",

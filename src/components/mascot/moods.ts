@@ -35,3 +35,38 @@ export function setMoodInstant(
     mat.emissive.setRGB(r, g, b);
   });
 }
+
+/**
+ * Recolor the whole mascot to a mood: the orb gets full color + emissive (it
+ * glows), the eyes get color only (no glow). Both tween together so a mood
+ * change reads as one seamless transition.
+ */
+export function applyMascotMood(
+  orb: THREE.MeshStandardMaterial[],
+  eyes: THREE.MeshStandardMaterial[],
+  theme: string,
+  gsapInstance: typeof import("gsap").gsap,
+  duration = 0.55
+) {
+  const [r, g, b] = getMoodColor(theme);
+  orb.forEach((mat) => {
+    gsapInstance.to(mat.color, { r, g, b, duration, ease: "power3.inOut" });
+    gsapInstance.to(mat.emissive, { r, g, b, duration, ease: "power3.inOut" });
+  });
+  eyes.forEach((mat) => {
+    gsapInstance.to(mat.color, { r, g, b, duration, ease: "power3.inOut" });
+  });
+}
+
+export function setMascotMoodInstant(
+  orb: THREE.MeshStandardMaterial[],
+  eyes: THREE.MeshStandardMaterial[],
+  theme: string
+) {
+  const [r, g, b] = getMoodColor(theme);
+  orb.forEach((mat) => {
+    mat.color.setRGB(r, g, b);
+    mat.emissive.setRGB(r, g, b);
+  });
+  eyes.forEach((mat) => mat.color.setRGB(r, g, b));
+}

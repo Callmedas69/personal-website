@@ -117,7 +117,8 @@ export function computeDissolveDirs(finals: VoxelTransform[]): THREE.Vector3[] {
 
 /**
  * Scrub-driven dissolve: at p=0 voxels sit at finals (assembled); at p=1 they
- * have drifted outward by `spread` and faded out. Fully reversible.
+ * have flung outward by `spread`. Cubes stay fully opaque — they shatter and
+ * fly off-screen rather than fading. Fully reversible.
  */
 export function applyDissolve(
   voxels: THREE.Mesh[],
@@ -135,8 +136,5 @@ export function applyDissolve(
       f.position.y + d.y * eased * spread,
       f.position.z + d.z * eased * spread
     );
-    const mat = v.material as THREE.MeshStandardMaterial;
-    mat.transparent = true;
-    mat.opacity = 1 - p;
   });
 }

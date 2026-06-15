@@ -11,8 +11,17 @@ import {
   computeDissolveDirs,
   applyDissolve,
 } from "./assembly";
-import { applyMoodToMaterials, setMoodInstant } from "./moods";
+import { applyMascotMood, setMascotMoodInstant } from "./moods";
 import { POSES, type SectionName } from "./poses";
+
+// each section gives the mascot a mood — eyes + orb recolor as you scroll through
+const SECTION_MOOD: Record<SectionName, string> = {
+  hero: "thinking",
+  terminal: "flow",
+  log: "shipping",
+  onchain: "flow",
+  footer: "broke",
+};
 
 const MODEL_URL = "/models/0xnull.glb";
 // distance from camera to model plane
@@ -76,6 +85,12 @@ export default function MascotStage() {
     let baseEyeScaleY: number[] = [];
     let blinkTimer: number | null = null;
     let eyePulse = 0;
+
+    // per-part interactive motion
+    let baseHandY: number[] = [];
+    let gazeStep = 0; // local-space unit used to size the hand bob
+    let orbGlow = 0; // eased hover-glow boost on the orb
+    const orbWorld = new THREE.Vector3();
 
     // dissolve finale
     let dissolveDirs: THREE.Vector3[] = [];
@@ -167,8 +182,16 @@ export default function MascotStage() {
       // a full barrel-spin backwards (the log section can push rotY past 2π)
       worldCur.rotY = ((worldCur.rotY + Math.PI) % TWO_PI + TWO_PI) % TWO_PI - Math.PI;
       Object.assign(worldTgt, computeTarget(name));
-      // a little eye-glow acknowledgement on each arrival
-      eyePulse = 0.7;
+      // recolor the mascot (eyes + orb) to this section's mood — a smooth tween,
+      // no brightness flare, so the scroll-through transition stays seamless
+      if (modelData) {
+        const mood = SECTION_MOOD[name];
+        if (reduced()) {
+          setMascotMoodInstant(modelData.moodMaterials, modelData.eyeMaterials, mood);
+        } else {
+          applyMascotMood(modelData.moodMaterials, modelData.eyeMaterials, mood, gsap);
+        }
+      }
     }
 
     function tickLoop() {
@@ -181,6 +204,13 @@ export default function MascotStage() {
       }
       idleT += 0.016;
       const isReduced = reduced();
+
+      // The hero pose is anchored to a DOM slot that scrolls with the page, so
+      // re-resolve its target every frame — otherwise it's only computed at the
+      // moment setSection("hero") fires (part-way up the page) and never settles
+      // back to the slot's resting rect when you scroll to the very top. Other
+      // sections are fixed NDC poses and only need the one-shot setSection target.
+      if (currentSection === "hero") Object.assign(worldTgt, computeTarget("hero"));
 
       // ease pose
       const k = 0.08;
@@ -201,12 +231,38 @@ export default function MascotStage() {
       modelGroup.rotation.y = worldCur.rotY + (isReduced ? 0 : curMouseX * 0.25);
       modelGroup.rotation.x = worldCur.rotX + (isReduced ? 0 : curMouseY * 0.14);
 
-      // eye glow decay back to the 0.25 baseline after a pulse
-      if (modelData && eyePulse > 0.001) {
-        modelData.moodMaterials.forEach((m) => {
-          m.emissiveIntensity = 0.25 + eyePulse;
+      // ── per-part interactive motion (only while live & not dissolving) ──
+      const interactive =
+        modelData != null && !isReduced && dissolveP < 0.001 && prevDissolveP < 0.001;
+
+      if (interactive && modelData) {
+        // hands: gentle bob, lagging the body bob — reads as channeling the orb
+        modelData.handVoxels.forEach((h, i) => {
+          h.position.y = baseHandY[i] + Math.sin(idleT * 0.8 - 0.6) * gazeStep * 0.6;
         });
-        eyePulse *= 0.92;
+
+        // orb hover-glow: project a representative orb voxel, compare to pointer NDC
+        const rep = modelData.orbVoxels[Math.floor(modelData.orbVoxels.length / 2)];
+        if (rep) {
+          modelGroup.updateMatrixWorld(true);
+          rep.getWorldPosition(orbWorld).project(camera);
+          const d = Math.hypot(orbWorld.x - mouseX, orbWorld.y - mouseY);
+          orbGlow += ((d < 0.28 ? 0.6 : 0) - orbGlow) * 0.1;
+        }
+      } else {
+        orbGlow += (0 - orbGlow) * 0.1;
+        // settle hands back to rest when paused (e.g. reduced-motion toggle)
+        if (modelData && dissolveP < 0.001 && prevDissolveP < 0.001) {
+          modelData.handVoxels.forEach((h, i) => (h.position.y = baseHandY[i]));
+        }
+      }
+
+      // orb emissive: idle breathe + section-arrival pulse + hover glow
+      if (modelData) {
+        const breathe = isReduced ? 0 : Math.sin(idleT * 1.2) * 0.12;
+        const intensity = 0.25 + breathe + eyePulse + orbGlow;
+        modelData.moodMaterials.forEach((m) => (m.emissiveIntensity = intensity));
+        if (eyePulse > 0.001) eyePulse *= 0.92;
       }
 
       // dissolve (only touch voxels while it's active or just settled to 0)
@@ -242,10 +298,10 @@ export default function MascotStage() {
         if (!modelData) return;
         const theme = document.documentElement.dataset.theme ?? "thinking";
         if (reduced()) {
-          setMoodInstant(modelData.moodMaterials, theme);
+          setMascotMoodInstant(modelData.moodMaterials, modelData.eyeMaterials, theme);
         } else {
-          applyMoodToMaterials(modelData.moodMaterials, theme, gsap);
-          eyePulse = 0.8; // flare the eyes on a mood switch
+          applyMascotMood(modelData.moodMaterials, modelData.eyeMaterials, theme, gsap);
+          eyePulse = 0.8; // flare the orb on a manual mood switch
         }
         renderFrame();
       });
@@ -322,8 +378,10 @@ export default function MascotStage() {
       heroAligned = true;
 
       baseEyeScaleY = modelData.eyeVoxels.map((e) => e.scale.y);
+      baseHandY = modelData.handVoxels.map((h) => h.position.y);
+      gazeStep = modelHeight * 0.02; // hand-bob amplitude (~⅓ voxel)
       dissolveDirs = computeDissolveDirs(modelData.finalTransforms);
-      dissolveSpread = modelHeight * 1.4;
+      dissolveSpread = modelHeight * 4; // fling the (opaque) cubes clear off-screen
 
       setupMoodObserver();
 
@@ -361,7 +419,7 @@ export default function MascotStage() {
       }
       if (disposed) return;
 
-      const { root, voxels, moodMaterials, finalTransforms } = modelData;
+      const { root, voxels, moodMaterials, eyeMaterials, finalTransforms } = modelData;
 
       modelGroup = new THREE.Group();
       modelGroup.add(root);
@@ -371,7 +429,7 @@ export default function MascotStage() {
       modelHeight = box.max.y - box.min.y;
       root.position.y = -(box.max.y + box.min.y) / 2;
 
-      setMoodInstant(moodMaterials, document.documentElement.dataset.theme ?? "thinking");
+      setMascotMoodInstant(moodMaterials, eyeMaterials, document.documentElement.dataset.theme ?? "thinking");
 
       const isBootPending = document.documentElement.dataset.boot === "pending";
 
