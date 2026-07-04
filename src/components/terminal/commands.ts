@@ -43,7 +43,7 @@ export function resolveCommand(raw: string): CommandResult | null {
     <span class="text-accent-blue font-bold">[ AI-NATIVE SYSTEMS ]</span>
     <ul class="list-disc list-inside text-text-slate ml-2 mt-1 space-y-0.5">
       <li>LLM context ops &amp; prompt engineering (<span class="text-accent-yellow">CLAUDE.md</span> boundary logic)</li>
-      <li>Obsidian Vault architecture — shared cognitive infrastructure</li>
+      <li>Obsidian Vault architecture, shared cognitive infrastructure</li>
       <li>Agentic workflows and automated developer briefings</li>
     </ul>
   </div>
@@ -59,7 +59,7 @@ export function resolveCommand(raw: string): CommandResult | null {
     <span class="text-accent-mint font-bold">[ CREATIVE FRONTEND ]</span>
     <ul class="list-disc list-inside text-text-slate ml-2 mt-1 space-y-0.5">
       <li>React, Next.js (App Router), TypeScript</li>
-      <li>Complex UI animations — <span class="text-accent-yellow font-semibold">GSAP Timelines</span> &amp; spring physics</li>
+      <li>Complex UI animations, <span class="text-accent-yellow font-semibold">GSAP Timelines</span> &amp; spring physics</li>
       <li>Utility-first styling with Tailwind CSS v4</li>
     </ul>
   </div>
@@ -84,7 +84,7 @@ export function resolveCommand(raw: string): CommandResult | null {
   </div>
   <div>
     <span class="text-accent-green font-bold">3. COGNITIVE VAULT</span> <span class="text-[10px] text-text-slate/60">(internal)</span>
-    <div class="ml-2 mt-0.5 text-text-primary">AI context engineering layer — Obsidian shared brain.</div>
+    <div class="ml-2 mt-0.5 text-text-primary">AI context engineering layer, Obsidian shared brain.</div>
     <div class="ml-2 text-[10px]">Stack: ContextOps routing, prompt mapping, daily hooks.</div>
   </div>
 </div>`,

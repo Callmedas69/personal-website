@@ -509,6 +509,7 @@ export default function MascotStage() {
     return () => {
       disposed = true;
       removeTicker();
+      assemblyTl?.kill();
       if (blinkTimer !== null) window.clearTimeout(blinkTimer);
       window.removeEventListener("resize", resize);
       window.removeEventListener("pointermove", onPointerMove);

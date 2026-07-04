@@ -46,9 +46,7 @@ export default function RpcConsole({ logs }: { logs: string[] }) {
                 : log.includes("Error:") || log.includes("[ERROR]")
                 ? "text-red-400 font-semibold"
                 : log.includes("Connected to") || log.includes("Wallet status:") || log.includes("RPC status:")
-                ? "text-accent-blue"
-                : log.includes(">>")
-                ? "text-accent-yellow"
+                ? "text-text-primary"
                 : ""
             }
           >

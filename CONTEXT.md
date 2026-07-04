@@ -81,5 +81,9 @@ STRICT: do not read the whole codebase. only read the part of codebase that is r
 - [ ] **Perf profile**: 4x CPU-throttle scrub through terminal pin + Lighthouse mobile run.
 - [ ] **Self-host Sohne fonts** via next/font/local (currently hotlinked from stripe.dev with preload + swap).
 - [ ] **Decide**: WobbleVisualizer as footer easter egg or delete.
-- [ ] **Commit leftovers**: `git add .gitignore CNAME && git commit -m "chore: ignore .gstack, drop CNAME" && git push`. (3 min)
+- [x] **Commit leftovers** (stale — .gitignore `.gstack/` + CNAME removal already landed in an earlier commit; nothing left uncommitted as of 2026-07-04)
+
+### Session 2026-07-04 Changes
+- **CLAUDE.md**: added "Model routing (through July 7)" section — Sonnet 5 default, Fable 5 reserved for heavy tasks (migrations, codebase-wide refactors, hard bugs), note on Opus 4.8 security-adjacent reroute.
+- **Commit**: `aec3b5c` pushed to main.
 

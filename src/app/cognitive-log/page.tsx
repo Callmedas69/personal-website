@@ -52,7 +52,7 @@ export default function CognitiveLog() {
               }
               const dateObj = new Date(timestamp);
               const formattedDate = isNaN(dateObj.getTime())
-                ? "2026.06.02"
+                ? "date unknown"
                 : `${dateObj.getFullYear()}.${String(dateObj.getMonth() + 1).padStart(2, "0")}.${String(dateObj.getDate()).padStart(2, "0")}`;
 
               const cats = post.categories || [];
@@ -207,7 +207,7 @@ export default function CognitiveLog() {
             <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-text-slate" />
             <input
               type="text"
-              placeholder="Search articles..."
+              placeholder="search articles..."
               value={searchQuery}
               onChange={e => setSearchQuery(e.target.value)}
               className="w-full bg-terminal-inner border border-border-line rounded px-8 py-1.5 font-mono text-xs text-text-primary placeholder-text-slate/50 outline-none focus:border-accent-blue/50 transition-colors"
@@ -220,13 +220,13 @@ export default function CognitiveLog() {
           {/* Left Column: Filter Sidebar */}
           <div className="lg:col-span-3 flex flex-col space-y-6">
             <div className="flex justify-between items-center font-mono text-xs border-b border-border-line/30 pb-2">
-              <span className="text-text-slate">/ FILTER</span>
+              <span className="text-text-slate">/ filter</span>
               {(selectedTypes.length > 0 || selectedTopics.length > 0 || searchQuery) && (
                 <button
                   onClick={clearFilters}
                   className="text-accent-blue hover:text-accent-mint transition-colors cursor-pointer"
                 >
-                  CLEAR FILTERS
+                  clear filters
                 </button>
               )}
             </div>
@@ -240,7 +240,7 @@ export default function CognitiveLog() {
                 >
                   <span className="flex items-center space-x-1.5">
                     <span className="w-1.5 h-1.5 bg-accent-blue rounded-sm"></span>
-                    <span>Type</span>
+                    <span>type</span>
                   </span>
                   <ChevronDown size={14} className={`transform transition-transform ${typeOpen ? "" : "-rotate-90"}`} />
                 </button>
@@ -271,7 +271,7 @@ export default function CognitiveLog() {
                 >
                   <span className="flex items-center space-x-1.5">
                     <span className="w-1.5 h-1.5 bg-accent-mint rounded-sm"></span>
-                    <span>Topic</span>
+                    <span>topic</span>
                   </span>
                   <ChevronDown size={14} className={`transform transition-transform ${topicOpen ? "" : "-rotate-90"}`} />
                 </button>
@@ -296,7 +296,7 @@ export default function CognitiveLog() {
             {/* FIG. 3 Interactive Artwork */}
             <div className="border border-border-line/45 rounded-lg bg-terminal-inner/20 p-4 font-mono text-[9px] text-text-slate flex flex-col space-y-2 select-none relative overflow-hidden h-[180px]">
               <div className="flex justify-between border-b border-border-line/35 pb-1">
-                <span>[ FIG. 3 ]</span>
+                <span>fig. 3</span>
                 <span className="text-accent-mint">ICM_INDEX</span>
               </div>
               <div className="flex-1 relative flex items-center justify-center">
@@ -320,9 +320,9 @@ export default function CognitiveLog() {
               
               {/* Table Header */}
               <div className="flex justify-between sm:grid sm:grid-cols-12 px-5 py-3 border-b border-border-line/50 font-mono text-[10px] text-text-slate tracking-wider select-none bg-terminal-inner/50">
-                <div className="sm:col-span-2">/ DATE<span className="sm:hidden"> / NAME</span></div>
-                <div className="hidden sm:block sm:col-span-8">/ NAME</div>
-                <div className="sm:col-span-2 text-right">/ TYPE</div>
+                <div className="sm:col-span-2">/ date<span className="sm:hidden"> / name</span></div>
+                <div className="hidden sm:block sm:col-span-8">/ name</div>
+                <div className="sm:col-span-2 text-right">/ type</div>
               </div>
 
               {/* Table Body */}
@@ -380,7 +380,7 @@ export default function CognitiveLog() {
                             </span>
                             {item.topics.includes("DRAFT") && (
                               <span className="px-1.5 py-0.5 rounded border border-accent-yellow/30 text-accent-yellow bg-accent-yellow/5 text-[8px] font-mono font-bold tracking-wider scale-90">
-                                DRAFT
+                                draft
                               </span>
                             )}
                           </div>
@@ -388,13 +388,7 @@ export default function CognitiveLog() {
 
                         {/* Type & Accordion Action */}
                         <div className="shrink-0 sm:col-span-2 flex items-center justify-end space-x-3">
-                          <span className={`px-2 py-0.5 rounded border text-[9px] font-mono font-bold tracking-wider ${
-                            item.type === "BLOG"
-                              ? "border-accent-blue/30 text-accent-blue bg-accent-blue/5"
-                              : item.type === "VIDEO"
-                              ? "border-accent-purple/30 text-accent-purple bg-accent-purple/5"
-                              : "border-accent-mint/30 text-accent-mint bg-accent-mint/5"
-                          }`}>
+                          <span className="px-2 py-0.5 rounded border border-border-line/40 text-text-slate bg-terminal-bg/30 text-[9px] font-mono font-bold tracking-wider">
                             {item.type}
                           </span>
                           <div className="text-text-slate">
@@ -410,7 +404,7 @@ export default function CognitiveLog() {
                         style={{ gridTemplateRows: expandedRow === item.id ? "1fr" : "0fr" }}
                       >
                         <div className="overflow-hidden">
-                        <div className="px-5 pb-5 pt-1 border-x border-b border-accent-mint/20 bg-accent-mint/5 rounded-b-lg font-mono text-xs text-text-slate space-y-3">
+                        <div className="px-5 pb-5 pt-1 border-x border-b border-border-line/40 bg-terminal-inner/20 rounded-b-lg font-mono text-xs text-text-slate space-y-3">
                           {item.subtitle && (
                             <p className="text-white font-medium">{item.subtitle}</p>
                           )}
@@ -418,7 +412,7 @@ export default function CognitiveLog() {
                             <p className="leading-relaxed text-[11px] max-w-3xl">{item.excerpt}</p>
                           )}
                           <div className="flex flex-wrap gap-2.5 items-center pt-2">
-                            <span className="text-[10px] text-text-slate/60 mr-1">TOPICS:</span>
+                            <span className="text-[10px] text-text-slate/60 mr-1">topics:</span>
                             {item.topics.map(topic => (
                               <span key={topic} className="px-1.5 py-0.5 rounded bg-terminal-bg/50 border border-border-line text-[9px] text-text-slate font-medium">
                                 #{topic.toLowerCase()}
@@ -432,10 +426,10 @@ export default function CognitiveLog() {
                             >
                               <span>
                                 {item.type === "BLOG"
-                                  ? "READ ARTICLE"
+                                  ? "read article"
                                   : item.type === "VIDEO"
-                                  ? "WATCH VIDEO"
-                                  : "VIEW EVENT"}
+                                  ? "watch video"
+                                  : "view event"}
                               </span>
                               <ExternalLink size={12} />
                             </a>

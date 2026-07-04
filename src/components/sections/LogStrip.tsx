@@ -89,15 +89,7 @@ export default function LogStrip({ posts }: { posts: FeedItem[] }) {
             >
               <div className="flex items-center justify-between text-[10px]">
                 <span className="text-accent-blue">{post.date}</span>
-                <span
-                  className={`px-2 py-0.5 rounded border font-bold tracking-wider text-[9px] ${
-                    post.type === "BLOG"
-                      ? "border-accent-blue/30 text-accent-blue bg-accent-blue/5"
-                      : post.type === "VIDEO"
-                      ? "border-accent-purple/30 text-accent-purple bg-accent-purple/5"
-                      : "border-accent-mint/30 text-accent-mint bg-accent-mint/5"
-                  }`}
-                >
+                <span className="px-2 py-0.5 rounded border border-border-line/40 text-text-slate bg-terminal-bg/30 font-bold tracking-wider text-[9px]">
                   {post.type}
                 </span>
               </div>

@@ -11,10 +11,21 @@ export default function Header() {
   const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 24);
-    onScroll();
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
+    // IntersectionObserver instead of a raw scroll listener: a 24px sentinel
+    // prepended to the document, in normal flow, so it scrolls away exactly
+    // at the threshold. No per-frame scroll handler driving React state.
+    const sentinel = document.createElement("div");
+    sentinel.style.cssText =
+      "position:absolute;top:0;left:0;width:1px;height:24px;visibility:hidden;pointer-events:none;";
+    document.body.prepend(sentinel);
+
+    const observer = new IntersectionObserver(([entry]) => setScrolled(!entry.isIntersecting));
+    observer.observe(sentinel);
+
+    return () => {
+      observer.disconnect();
+      sentinel.remove();
+    };
   }, []);
 
   return (
@@ -33,8 +44,8 @@ export default function Header() {
           <span className="hidden sm:inline text-text-slate/40 text-xs" aria-hidden="true">|</span>
           <div className="hidden sm:flex items-center space-x-1 bg-terminal-inner/60 border border-border-line/60 rounded px-1.5 sm:px-2 py-0.5 text-[9px] font-mono text-accent-mint">
             <span className="w-1.5 h-1.5 rounded-full bg-accent-mint animate-pulse"></span>
-            <span className="hidden sm:inline">BASE_MAINNET : ONLINE</span>
-            <span className="sm:hidden">ONLINE</span>
+            <span className="hidden sm:inline">BASE_MAINNET : online</span>
+            <span className="sm:hidden">online</span>
           </div>
         </div>
         <div className="flex items-center space-x-3 sm:space-x-5 text-xs text-text-slate font-mono">

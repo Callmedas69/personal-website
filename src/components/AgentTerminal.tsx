@@ -319,7 +319,6 @@ export default function AgentTerminal({
               style={{
                 backgroundColor: color,
                 opacity: themeMood === id ? 1 : 0.3,
-                boxShadow: themeMood === id ? `0 0 6px ${color}` : "none",
               }}
             />
           ))}
@@ -342,7 +341,7 @@ export default function AgentTerminal({
           </div>
           <div className="flex items-center space-x-1.5 text-xs text-text-slate bg-terminal-bg/40 border border-border-line rounded px-3 py-1.5 w-fit">
             <AlertTriangle size={12} className="text-accent-yellow" />
-            <span>this feature uses AI. responses may be inaccurate — always verify.</span>
+            <span>this feature uses AI. responses may be inaccurate, always verify.</span>
           </div>
         </div>
 
@@ -485,7 +484,7 @@ export default function AgentTerminal({
           tabIndex={scripted ? -1 : 0}
           placeholder={
             scripted
-              ? "// demo session — scroll, or click to skip"
+              ? "// demo session, scroll or click to skip"
               : isTyping
               ? "agent is responding..."
               : "ask 0xNull a question..."

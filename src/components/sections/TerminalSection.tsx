@@ -24,16 +24,16 @@ const MARGINALIA = [
     key: "files",
     body: (
       <div className="grid grid-cols-3 gap-2 text-[10px] text-center">
-        <div className="border border-accent-blue/30 rounded p-2 bg-accent-blue/5">
-          <div className="font-semibold text-accent-blue text-[9px]">CLAUDE.md</div>
+        <div className="border border-border-line/40 rounded p-2 bg-terminal-inner/20">
+          <div className="font-semibold text-text-primary text-[9px]">CLAUDE.md</div>
           <div className="text-[7.5px] text-text-slate mt-0.5">ROUTING RULES</div>
         </div>
-        <div className="border border-accent-mint/30 rounded p-2 bg-accent-mint/5">
-          <div className="font-semibold text-accent-mint text-[9px]">CONTEXT.md</div>
+        <div className="border border-border-line/40 rounded p-2 bg-terminal-inner/20">
+          <div className="font-semibold text-text-primary text-[9px]">CONTEXT.md</div>
           <div className="text-[7.5px] text-text-slate mt-0.5">WORKSPACE RULES</div>
         </div>
-        <div className="border border-accent-yellow/30 rounded p-2 bg-accent-yellow/5">
-          <div className="font-semibold text-accent-yellow text-[9px]">FILESYSTEM</div>
+        <div className="border border-border-line/40 rounded p-2 bg-terminal-inner/20">
+          <div className="font-semibold text-text-primary text-[9px]">FILESYSTEM</div>
           <div className="text-[7.5px] text-text-slate mt-0.5">WORKFLOW STAGES</div>
         </div>
       </div>
@@ -145,7 +145,7 @@ export default function TerminalSection() {
               </div>
             ))}
             {mode === "interactive" && demoSeen && (
-              <div className="text-[11px] text-accent-mint">// session attached — your turn</div>
+              <div className="text-[11px] text-accent-mint">// session attached, your turn</div>
             )}
           </aside>
 
