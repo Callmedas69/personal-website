@@ -9,6 +9,9 @@ export const metadata: Metadata = {
   icons: {
     icon: "/favicon.ico",
   },
+  appleWebApp: {
+    title: "0xdas",
+  },
 };
 
 export default function RootLayout({
