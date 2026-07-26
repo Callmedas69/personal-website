@@ -73,8 +73,10 @@ export default function BootOverlay() {
         stagger: 0.28,
       });
       tl.to("[data-boot-progress]", { scaleX: 1, duration: 1.3, ease: "none" }, 0.1);
-      // signal 3D mascot to begin voxel assembly (fires at progress bar start)
-      tl.call(() => document.dispatchEvent(new CustomEvent("boot-assembly-start")), [], 0.1);
+      // signal 3D mascot to begin voxel assembly (fires at progress bar start).
+      // deferred out of the timeline callback so listeners' gsap work is not
+      // captured by this timeline's useGSAP context (its scope unmounts on finish)
+      tl.call(() => setTimeout(() => document.dispatchEvent(new CustomEvent("boot-assembly-start")), 0), [], 0.1);
       // hold while the spinner runs, then flip [/] → [ok] and pause a beat
       tl.to({}, { duration: 1.2 });
       tl.call(stopSpinner);
@@ -82,7 +84,7 @@ export default function BootOverlay() {
       // only fade progress bar — 3D mascot handles its own transition out
       tl.to("[data-boot-progress]", { autoAlpha: 0, duration: 0.2 }, "<");
       // hero entrance fires as the wipe begins, so the two motions overlap
-      tl.call(() => document.dispatchEvent(new CustomEvent("boot-complete")));
+      tl.call(() => setTimeout(() => document.dispatchEvent(new CustomEvent("boot-complete")), 0));
       tl.to(overlayRef.current, { yPercent: -100, duration: 0.7, ease: EASE.out }, "-=0.05");
 
       // any key or click skips to the end

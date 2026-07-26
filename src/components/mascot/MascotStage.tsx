@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useRef } from "react";
 import * as THREE from "three";
+import { useGSAP } from "@gsap/react";
 import { gsap, ScrollTrigger, DUR, EASE, MM } from "@/lib/motion";
 import { createRenderer, createScene, loadModel, computeModelBounds } from "./scene";
 import {
@@ -44,7 +45,8 @@ function getSlotRect(selector: string): DOMRect | null {
 export default function MascotStage() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
-  useEffect(() => {
+  useGSAP(
+    () => {
     const canvas = canvasRef.current;
     if (!canvas) return;
     const cvs: HTMLCanvasElement = canvas;
@@ -518,7 +520,9 @@ export default function MascotStage() {
       scrollTriggers.forEach((st) => st.kill());
       renderer.dispose();
     };
-  }, []);
+    },
+    { scope: canvasRef }
+  );
 
   return (
     <canvas

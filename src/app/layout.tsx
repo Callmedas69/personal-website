@@ -4,6 +4,7 @@ import SmoothScroll from "@/components/SmoothScroll";
 import "./globals.css";
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://0xdas.dev"),
   title: "0xdas.dev · talk-to-my-agent",
   description: "AI-native onchain developer building autonomous systems, creative web experiences, and fully onchain products.",
   icons: {
@@ -11,6 +12,19 @@ export const metadata: Metadata = {
   },
   appleWebApp: {
     title: "0xdas",
+  },
+  openGraph: {
+    title: "0xdas.dev · talk-to-my-agent",
+    description: "AI-native onchain developer building autonomous systems, creative web experiences, and fully onchain products.",
+    siteName: "0xdas.dev",
+    type: "website",
+    images: [{ url: "/og.png", width: 1200, height: 630, alt: "0xdas.dev · talk-to-my-agent" }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "0xdas.dev · talk-to-my-agent",
+    description: "AI-native onchain developer building autonomous systems, creative web experiences, and fully onchain products.",
+    images: ["/og.png"],
   },
 };
 

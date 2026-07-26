@@ -489,7 +489,7 @@ export default function AgentTerminal({
               ? "agent is responding..."
               : "ask 0xNull a question..."
           }
-          className="flex-1 bg-transparent border-none outline-none font-mono text-sm ml-2.5 text-text-primary placeholder-text-slate/60 disabled:cursor-not-allowed"
+          className="flex-1 bg-transparent border-none outline-none font-mono text-sm ml-2.5 text-text-primary placeholder-text-slate/60 disabled:cursor-not-allowed focus-visible:ring-1 focus-visible:ring-accent-blue/50 rounded-sm"
         />
         <div className="flex items-center space-x-3 text-xs font-mono text-text-slate">
           <span className="hidden sm:inline-block text-[10px] text-text-slate/65 border border-border-line px-1 rounded bg-terminal-bg/50">
@@ -500,6 +500,7 @@ export default function AgentTerminal({
           </span>
           <button
             type="submit"
+            aria-label="send"
             disabled={!inputVal.trim() || isTyping}
             className="text-text-slate hover:text-accent-mint transition-colors disabled:opacity-45 disabled:hover:text-text-slate cursor-pointer"
           >

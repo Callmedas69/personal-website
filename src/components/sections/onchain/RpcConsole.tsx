@@ -21,7 +21,11 @@ export default function RpcConsole({ logs }: { logs: string[] }) {
       const lines = el.querySelectorAll("[data-rpc-line]");
       const fresh = Array.from(lines).slice(prevCount.current);
       if (fresh.length) {
-        gsap.from(fresh, { autoAlpha: 0, y: 6, duration: 0.25, ease: "power4.out", stagger: 0.05 });
+        const tw = gsap.from(fresh, { autoAlpha: 0, y: 6, duration: 0.25, ease: "power4.out", stagger: 0.05 });
+        prevCount.current = logs.length;
+        return () => {
+          tw.kill();
+        };
       }
     }
     prevCount.current = logs.length;

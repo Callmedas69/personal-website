@@ -14,11 +14,14 @@ export default function BlockTicker({ blockNumber }: { blockNumber?: bigint }) {
     lastBlock.current = blockNumber;
     if (isFirst || !numRef.current) return;
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    gsap.fromTo(
+    const tw = gsap.fromTo(
       numRef.current,
       { y: 12, autoAlpha: 0 },
       { y: 0, autoAlpha: 1, duration: 0.25, ease: "power4.out" }
     );
+    return () => {
+      tw.kill();
+    };
   }, [blockNumber]);
 
   return (

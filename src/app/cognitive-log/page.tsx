@@ -252,7 +252,7 @@ export default function CognitiveLog() {
                           type="checkbox"
                           checked={selectedTypes.includes(type)}
                           onChange={() => handleTypeChange(type)}
-                          className="rounded bg-terminal-inner border-border-line text-accent-blue focus:ring-0 outline-none cursor-pointer"
+                          className="rounded bg-terminal-inner border-border-line text-accent-blue focus:ring-0 outline-none focus-visible:ring-1 focus-visible:ring-accent-blue/50 cursor-pointer"
                         />
                         <span>{type.charAt(0) + type.slice(1).toLowerCase()} ({getTypeCount(type)})</span>
                       </label>
@@ -283,7 +283,7 @@ export default function CognitiveLog() {
                           type="checkbox"
                           checked={selectedTopics.includes(topic)}
                           onChange={() => handleTopicChange(topic)}
-                          className="rounded bg-terminal-inner border-border-line text-accent-blue focus:ring-0 outline-none cursor-pointer"
+                          className="rounded bg-terminal-inner border-border-line text-accent-blue focus:ring-0 outline-none focus-visible:ring-1 focus-visible:ring-accent-blue/50 cursor-pointer"
                         />
                         <span>{topic} ({getTopicCount(topic)})</span>
                       </label>
